@@ -22,7 +22,7 @@ flowchart TD
     B -- nie --> C[Formularz: 3 pola]
     C --> D[Walidacja i POST do Apps Script]
     D -- błąd danych --> C
-    D --> E{Numer już w arkuszu?}
+    D --> E{Numer i imię już w arkuszu?}
     E -- tak --> F[Komunikat: podejdź do obsługi]
     F --> J[Obsługa szuka ID w arkuszu]
     E -- nie --> G[Arkusz: ID, ksywa, typ biletu]
@@ -40,18 +40,18 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 | F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. | Wymaganie |
 | F2 | Strona sprawdza dane przed wysłaniem (reguły w sekcji „Walidacja i komunikaty”). Serwer sprawdza je ponownie. | Założenie |
 | F3 | Przycisk „Zarejestruj” blokuje się na czas wysyłania, żeby jedno kliknięcie dawało jeden wiersz. | Założenie |
-| F4 | Serwer usuwa spacje z numeru zamówienia i porównuje go jako tekst z kolumną „Nr Zamówienia”. | Założenie |
-| F5 | Gdy numer już jest w arkuszu, serwer odrzuca zgłoszenie, a strona pokazuje komunikat z prośbą o kontakt z obsługą. Nowy wiersz nie powstaje. | Wymaganie |
-| F6 | Gdy numeru nie ma, serwer nadaje kolejny numer ID (kolumna „Lp”: 1, 2, 3…), dopisuje wiersz i zwraca ID. | Wymaganie |
-| F7 | Serwer szuka numeru zamówienia na karcie „Bilety” (lista wszystkich biletów) i wpisuje znalezioną ksywę do kolumny „Ksywa”, a typ do kolumny „Typ Biletu”. Gdy numeru nie ma na liście, „Ksywa” zostaje pusta, „Typ Biletu” dostaje „brak na liście”, a rejestracja przechodzi. | Wymaganie (zachowanie przy braku: założenie) |
+| F4 | Jedno zamówienie może obejmować kilka osób o różnych imionach i nazwiskach. Duplikat to wiersz z tym samym numerem zamówienia i tym samym „Imię I.” (bez rozróżniania wielkości liter). Serwer przed porównaniem usuwa spacje z numeru. | Wymaganie |
+| F5 | Gdy para numer + „Imię I.” już jest w arkuszu, serwer odrzuca zgłoszenie, a strona pokazuje komunikat z prośbą o kontakt z obsługą. Nowy wiersz nie powstaje. | Wymaganie |
+| F6 | Gdy takiej pary nie ma, serwer nadaje kolejny numer ID (kolumna „Lp”: 1, 2, 3…), dopisuje wiersz i zwraca ID. | Wymaganie |
+| F7 | Serwer szuka na karcie „Bilety” (lista wszystkich biletów) wiersza z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od podanego inicjału. Z tego wiersza wpisuje ksywę do kolumny „Ksywa”, a typ do kolumny „Typ Biletu”. Gdy takiego wiersza nie ma, „Ksywa” zostaje pusta, „Typ Biletu” dostaje „brak na liście”, a rejestracja przechodzi. | Wymaganie (zachowanie przy braku: założenie) |
 | F8 | Strona zapisuje w localStorage ID, numer zamówienia, imię, inicjał, ksywę, typ biletu i czas rejestracji. | Wymaganie |
 | F9 | Przy ponownym wejściu strona odczytuje localStorage i od razu pokazuje ekran z ID, bez formularza i bez wywołania serwera. | Wymaganie |
 | F10 | Ekran z ID pokazuje duży numer ID, „Imię I.”, ksywę, numer zamówienia, typ biletu i instrukcję „Pokaż ten ekran obsłudze”. Działa bez internetu. | Wymaganie |
-| F11 | Obsługa wpisuje uwagi w kolumnie „Działanie” (wolny tekst). Strona uczestnika nie czyta tej kolumny. | Wymaganie |
+| F11 | Obsługa wpisuje uwagi w kolumnie „Działanie” (wolny tekst) i wypełnia kolumnę „Status”. Strona uczestnika nie czyta tych kolumn. | Wymaganie (wartości „Status”: do ustalenia) |
 
 ## Struktura arkusza Google
 
-Jeden plik, dwie karty. Karta „Rejestracje” ma układ podany przez organizatora: wiersz 1 to nagłówki, każdy kolejny wiersz to jedna rejestracja. Kolumny A–E wypełnia skrypt, kolumnę F obsługa. Karta „Bilety” to lista wszystkich biletów, z której skrypt bierze ksywę i typ biletu.
+Jeden plik, dwie karty. Karta „Rejestracje” ma układ podany przez organizatora: wiersz 1 to nagłówki, każdy kolejny wiersz to jedna rejestracja. Kolumny A–E wypełnia skrypt, kolumny F–G obsługa. Karta „Bilety” to lista wszystkich biletów, z której skrypt bierze ksywę i typ biletu.
 
 Karta „Rejestracje”:
 
@@ -63,14 +63,16 @@ Karta „Rejestracje”:
 | D | Nr Zamówienia | same cyfry, format „Zwykły tekst” | skrypt | 3012456 |
 | E | Typ Biletu | wartość z karty „Bilety” albo „brak na liście” | skrypt | (wartość z listy biletów) |
 | F | Działanie | wolny tekst | obsługa | (uwagi obsługi) |
+| G | Status | do ustalenia | obsługa | (status weryfikacji) |
 
 Karta „Bilety” (układ do potwierdzenia):
 
 | Kolumna | Nagłówek | Typ | Wypełnia |
 | --- | --- | --- | --- |
 | A | Nr Zamówienia | same cyfry | import z systemu sprzedaży |
-| B | Typ Biletu | tekst | import z systemu sprzedaży |
-| C | Ksywa | tekst | import z zapisów na sesje |
+| B | Imię i nazwisko | tekst, jedna osoba w wierszu | import z systemu sprzedaży |
+| C | Typ Biletu | tekst | import z systemu sprzedaży |
+| D | Ksywa | tekst | import z zapisów na sesje |
 
 Pierwszy wiersz zamrożony na obu kartach. Arkusz nie ma kolumny z datą rejestracji; data zostaje w odpowiedzi API i w localStorage. Ochrona zakresu A:E na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
 
@@ -101,7 +103,7 @@ Apps Script zawsze zwraca HTTP 200, więc wynik niesie pole `ok` i kod `error`.
 | --- | --- |
 | Zapisano | `{"ok":true,"id":17,"nickname":"<ksywa z listy>","ticketType":"<typ z listy>","registeredAt":"2026-11-14T09:42:05+01:00"}` |
 | Zapisano, numeru nie ma na liście biletów | `{"ok":true,"id":18,"nickname":null,"ticketType":null,"registeredAt":"…"}` |
-| Numer już zarejestrowany | `{"ok":false,"error":"DUPLICATE"}` |
+| Numer i „Imię I.” już zarejestrowane | `{"ok":false,"error":"DUPLICATE"}` |
 | Błędne dane | `{"ok":false,"error":"VALIDATION","field":"orderNumber"}` |
 | Blokada zajęta dłużej niż 10 s | `{"ok":false,"error":"BUSY"}` |
 | Inny błąd skryptu | `{"ok":false,"error":"SERVER"}` |
@@ -112,7 +114,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 | Pole | Reguła | Komunikat przy błędzie |
 | --- | --- | --- |
-| Numer zamówienia | same cyfry, 7 znaków jak w przykładzie 3012456; spacje usuwane przed sprawdzeniem; pole z `inputmode="numeric"` (klawiatura numeryczna na telefonie) | „Sprawdź numer zamówienia: same cyfry, np. 3012456.” |
+| Numer zamówienia | same cyfry, 4–12 znaków (przykład 3012456); spacje usuwane przed sprawdzeniem; pole z `inputmode="numeric"` (klawiatura numeryczna na telefonie) | „Sprawdź numer zamówienia: same cyfry, np. 3012456.” |
 | Imię | 2–30 znaków, litery (także polskie), spacja, „-”; zaczyna się od litery | „Wpisz imię (same litery).” |
 | Inicjał nazwiska | dokładnie jedna litera, zapisywana wielką | „Wpisz pierwszą literę nazwiska.” |
 | Każde pole | wymagane | „Uzupełnij to pole.” |
@@ -141,7 +143,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | --- | --- | --- |
 | Ktoś wpisze cudzy numer zamówienia | właściciel zamówienia dostaje `DUPLICATE` | obsługa porównuje imię i inicjał z zamówieniem, opisuje sprawę w kolumnie „Działanie” |
 | Numeru nie ma na liście biletów (literówka albo nieaktualna lista) | wiersz z „brak na liście” w kolumnie „Typ Biletu” | filtr na „brak na liście”, obsługa sprawdza zamówienie ręcznie |
-| Jedno zamówienie obejmuje kilka biletów | druga osoba z tego zamówienia jest odrzucana | decyzja w otwartych pytaniach |
+| Dwie osoby z jednego zamówienia mają to samo imię i inicjał nazwiska | druga dostaje `DUPLICATE` | obsługa dopisuje ją ręcznie i opisuje sprawę w kolumnie „Działanie” |
 | Uczestnik wyczyści przeglądarkę lub zmieni telefon | traci ekran z ID, ponowna próba daje `DUPLICATE` | obsługa szuka po kolumnie „Nr Zamówienia” |
 | Publiczny adres API | spam w arkuszu | pułapka `website`, limity długości, reguły znaków; filtr w arkuszu przy sprzątaniu |
 | Pierwsze wywołanie Apps Script po przerwie trwa dłużej | uczestnik klika ponownie | blokada przycisku (F3), tekst „Rejestruję…” |
@@ -158,11 +160,11 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 ## Otwarte pytania
 
-- [ ] Czy numer zamówienia ma zawsze 7 cyfr (jak 3012456)?
+- [ ] Czy numer zamówienia ma stałą liczbę cyfr? Teraz reguła przyjmuje 4–12 cyfr.
 - [ ] Gdzie leżą lista wszystkich biletów i ksywy z zapisów na sesje: w jednym pliku czy w dwóch, na których kartach, w których kolumnach są numer zamówienia, typ biletu i ksywa, kto i jak często je aktualizuje?
 - [ ] Czy numer spoza listy biletów ma blokować rejestrację? Teraz rejestracja przechodzi z wpisem „brak na liście”.
-- [ ] Czy ksywa jest przypisana do numeru zamówienia, czy do osoby (gdy zamówienie obejmuje kilka biletów)?
-- [ ] Czy jedno zamówienie może obejmować kilka osób? Jeśli tak, unikalna może być para „numer + ksywa” albo limit rejestracji na numer równy liczbie biletów z listy.
+- [ ] Czy lista biletów ma imię i nazwisko przy każdym bilecie? Od tego zależy dopasowanie ksywy i typu biletu do osoby.
+- [ ] Jakie wartości ma kolumna „Status” i kto ją wypełnia?
 - [ ] Nazwa, data i miejsce wydarzenia (tekst na stronie i slug w kluczu localStorage).
 - [ ] Ile osób się spodziewacie i w jakim oknie czasowym rejestrują się najczęściej?
 - [ ] Czy ID (Lp) ma zaczynać się od 1, czy od innej liczby (np. 100, żeby każde ID miało trzy cyfry)?
@@ -174,14 +176,14 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 ### Kolejność prac
 
-1. Utwórz arkusz z kartą „Rejestracje” (A–F: Lp, Imię i Nazwisko Podane w formularz, Ksywa, Nr Zamówienia, Typ Biletu, Działanie) i format tekstu w kolumnie D.
+1. Utwórz arkusz z kartą „Rejestracje” (A–G: Lp, Imię i Nazwisko Podane w formularz, Ksywa, Nr Zamówienia, Typ Biletu, Działanie, Status) i format tekstu w kolumnie D.
 2. Dodaj kartę „Bilety” i zaimportuj listę wszystkich biletów z ksywami.
 3. Załóż repozytorium z projektem Vite (React + TypeScript) i Tailwind oraz katalogiem `apps-script/` pod clasp.
 4. Napisz `doPost`, wyślij go przez `clasp push`, wpisz `SHEET_ID` we Właściwościach skryptu, wdróż jako aplikację internetową.
 5. Sprawdź API z konsoli przeglądarki jednym `fetch` (sukces, duplikat, błędne dane, numer spoza listy).
 6. Zbuduj stronę: formularz, walidacja, wysyłanie z ponawianiem, ekran z ID, localStorage.
 7. Wypchnij repozytorium na GitHub, ustaw Pages na „GitHub Actions” i sprawdź publikację.
-8. Przejdź testy T1–T10 na Androidzie i iPhonie.
+8. Przejdź testy T1–T11 na Androidzie i iPhonie.
 9. Wygeneruj kod QR z adresem strony na plakat.
 10. Wyczyść wiersze testowe przed wydarzeniem.
 
@@ -191,11 +193,12 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | --- | --- | --- |
 | T1 | Pierwsza rejestracja z numerem z listy biletów | ekran z ID = 1, nowy wiersz z ksywą i typem biletu z karty „Bilety” |
 | T2 | Odświeżenie strony po rejestracji | ekran z tym samym ID, brak wywołania API |
-| T3 | Ten sam numer na innym telefonie | komunikat `DUPLICATE`, liczba wierszy bez zmian |
-| T4 | Ten sam numer ze spacją („3012 456”) | traktowany jak duplikat po usunięciu spacji |
+| T3 | Ten sam numer i to samo imię z inicjałem na innym telefonie | komunikat `DUPLICATE`, liczba wierszy bez zmian |
+| T4 | Ten sam numer ze spacją („3012 456”) i to samo imię z inicjałem | traktowany jak duplikat po usunięciu spacji |
 | T5 | Imię „=SUMA(1;1)” | odrzucone na stronie i na serwerze |
 | T6 | Tryb samolotowy przy wysyłaniu | komunikat o braku sieci, przycisk „Spróbuj ponownie” działa po powrocie sieci |
 | T7 | 25 równoległych żądań ze skryptu | 25 wierszy, ID 1–25 bez luk i powtórzeń, czas odpowiedzi zapisany |
 | T8 | Tryb prywatny przeglądarki | ekran z ID i prośba o zrzut ekranu |
 | T9 | Poprawny numer spoza listy biletów | rejestracja przechodzi, „Ksywa” pusta, „Typ Biletu” = „brak na liście” |
 | T10 | Numer z literą („301245a”) | odrzucony na stronie, komunikat przy polu |
+| T11 | Ten sam numer, inna osoba z zamówienia | nowy wiersz z kolejnym Lp, ksywą i typem biletu tej osoby |

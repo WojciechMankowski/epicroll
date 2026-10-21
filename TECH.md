@@ -106,7 +106,7 @@ Klucz `rejestracja-<slug-wydarzenia>-v1`, wartość to JSON z polami `id`, `orde
 
 | Pole | Wyrażenie |
 | --- | --- |
-| Numer zamówienia (po usunięciu spacji) | `^\d{7}$` |
+| Numer zamówienia (po usunięciu spacji) | `^\d{4,12}$` |
 | Imię | `^[\p{L}][\p{L} -]{1,29}$` (flaga `u`) |
 | Inicjał nazwiska | `^\p{L}$` (flaga `u`) |
 
@@ -141,11 +141,11 @@ Identyfikator arkusza leży we Właściwościach skryptu pod kluczem `SHEET_ID` 
 1. Parsuj `e.postData.contents` jako JSON, przytnij spacje, sprawdź reguły walidacji. Niepuste `website` → `VALIDATION`.
 2. Usuń spacje z numeru zamówienia.
 3. Załóż blokadę `LockService.getScriptLock().tryLock(10000)`. Brak blokady → `BUSY`.
-4. Odczytaj kolumny A i D karty „Rejestracje” jednym `getValues()`.
-5. Numer jest w kolumnie D (porównanie jako tekst, `String(v).trim()`) → zwolnij blokadę, zwróć `DUPLICATE`.
-6. Odczytaj kartę „Bilety” i znajdź ksywę oraz typ biletu dla numeru (też porównanie jako tekst). Brak → pusta ksywa i „brak na liście”.
+4. Odczytaj kolumny A, B i D karty „Rejestracje” jednym `getValues()`.
+5. Jest wiersz z tym samym numerem w D (porównanie jako tekst, `String(v).trim()`) i tym samym „Imię I.” w B (bez rozróżniania wielkości liter) → zwolnij blokadę, zwróć `DUPLICATE`.
+6. Odczytaj kartę „Bilety” i znajdź wiersz z tym numerem, w którym imię zgadza się z podanym, a nazwisko zaczyna się od inicjału (porównanie bez wielkości liter, z polskimi znakami). Weź z niego ksywę i typ biletu. Brak → pusta ksywa i „brak na liście”.
 7. Nowe ID = największa wartość w kolumnie A + 1 (działa także po ręcznym usunięciu wiersza).
-8. `appendRow([id, "Anna K.", ksywa, numer, typBiletu, ""])`, potem `SpreadsheetApp.flush()`.
+8. `appendRow([id, "Anna K.", ksywa, numer, typBiletu, "", ""])`, potem `SpreadsheetApp.flush()`.
 9. Zwolnij blokadę (`finally`), zwróć `ok: true` z ID, ksywą i typem biletu.
 
 Każda odpowiedź przechodzi przez jedną funkcję pomocniczą:
