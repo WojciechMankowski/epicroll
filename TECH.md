@@ -129,7 +129,21 @@ Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`
 
 ### Tailwind
 
-Tailwind v4 nie potrzebuje pliku konfiguracyjnego: wystarczy wtyczka `@tailwindcss/vite` w `vite.config.ts` i `@import "tailwindcss";` w `index.css`. Wymagania N1 i N3 ze SPEC.md (pola 44 px, numer ID 72 px) dają się ustawić klasami `min-h-11` i `text-7xl`.
+Tailwind v4 nie potrzebuje pliku konfiguracyjnego: wystarczy wtyczka `@tailwindcss/vite` w `vite.config.ts` i `@import "tailwindcss";` w `index.css`. Wymagania N1 i N3 ze SPEC.md (pola 44 px, numer ID 72 px) spełniają pola i przyciski `h-14` (56 px) i numer ID w `text-7xl` lub większym.
+
+Tokeny wyglądu są w `@theme` w `src/index.css` i dają klasy Tailwind (`bg-ink`, `text-muted`, `font-display`):
+
+| Token | Wartość | Użycie |
+| --- | --- | --- |
+| `ink` | `#16213e` | tekst, przyciski, tło ekranu z ID |
+| `paper` | `#f4f6f9` | tło strony |
+| `brass` | `#b8862b` | tylko na granacie: obrys kostki, fokus na ciemnym tle |
+| `mist` | `#dce2ea` | ramki pól |
+| `muted` | `#4a5568` | tekst pomocniczy |
+| `alert` | `#b42318` | błędy |
+| `font-sans` / `font-display` | Barlow / Barlow Condensed | tekst / nazwa wydarzenia, nagłówki, numer ID |
+
+Fonty pochodzą z pakietów `@fontsource/barlow` i `@fontsource/barlow-condensed` i są częścią builda, bez zapytań do Google Fonts. Kolory organizatora, jeśli będą, zmienia się tylko w `@theme`.
 
 ## API (Google Apps Script)
 

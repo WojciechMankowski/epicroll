@@ -44,7 +44,9 @@ describe('App', () => {
   it('pokazuje nazwę, datę i miejsce wydarzenia', () => {
     render(<App deps={{ register: fakeRegister(), storage: memoryStorage() }} />)
     expect(screen.getByRole('heading', { level: 1, name: 'EPIC ROLL' })).toBeInTheDocument()
-    expect(screen.getByText(/5 grudnia 2026/)).toHaveTextContent('Conradinum, Gdańsk')
+    const header = screen.getByRole('banner')
+    expect(header).toHaveTextContent('5 grudnia 2026')
+    expect(header).toHaveTextContent('Szkoły Okrętowe i Techniczne Conradinum, Gdańsk')
   })
 
   it('wpis w localStorage przy starcie: ekran z ID bez formularza i bez wywołania API (T2)', () => {

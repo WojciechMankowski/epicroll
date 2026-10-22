@@ -39,7 +39,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 
 | ID | Wymaganie | Źródło |
 | --- | --- | --- |
-| F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. Nagłówek strony i ekranu z ID to „EPIC ROLL”, pod nim „5 grudnia 2026 · Szkoły Okrętowe i Techniczne Conradinum, Gdańsk”. | Wymaganie |
+| F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. Nagłówek strony i ekranu z ID to „EPIC ROLL”, pod nim data „5 grudnia 2026” i miejsce „Szkoły Okrętowe i Techniczne Conradinum, Gdańsk”. | Wymaganie |
 | F2 | Strona sprawdza dane przed wysłaniem (reguły w sekcji „Walidacja i komunikaty”). Serwer sprawdza je ponownie. | Założenie |
 | F3 | Przycisk „Zarejestruj” blokuje się na czas wysyłania, żeby jedno kliknięcie dawało jeden wiersz. | Założenie |
 | F4 | Jedno zamówienie może obejmować kilka osób o różnych imionach i nazwiskach. Duplikat to wiersz z tym samym numerem zamówienia i tą samą osobą: to samo imię i ta sama pierwsza litera nazwiska, bez rozróżniania wielkości liter. „Anna K.” i dopisana ręcznie „Anna Kowalska” to ta sama osoba. Serwer przed porównaniem usuwa spacje z numeru. | Wymaganie |
