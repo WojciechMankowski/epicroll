@@ -1,4 +1,4 @@
-# Rejestracja na wydarzenie, opis technologii
+# Rejestracja na EPIC ROLL, opis technologii
 
 Stan na 21.10.2026 · Wojtek Mankowski
 
@@ -98,7 +98,7 @@ Błąd `VALIDATION` wraca do stanu `form` z komunikatem przy polu z `field`.
 
 ### localStorage
 
-Klucz `rejestracja-<slug-wydarzenia>-v1`, wartość to JSON z polami `id`, `orderNumber`, `firstName`, `lastInitial`, `nickname`, `ticketType`, `registeredAt`. `storage.ts` opakowuje `getItem` i `setItem` w `try/catch`. Gdy zapis się nie uda (tryb prywatny), `IdScreen` pokazuje prośbę o zrzut ekranu.
+Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`, `firstName`, `lastInitial`, `nickname`, `ticketType`, `registeredAt`. `storage.ts` opakowuje `getItem` i `setItem` w `try/catch`. Gdy zapis się nie uda (tryb prywatny), `IdScreen` pokazuje prośbę o zrzut ekranu.
 
 ### Walidacja
 

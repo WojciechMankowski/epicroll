@@ -1,4 +1,4 @@
-# Rejestracja na wydarzenie, specyfikacja prototypu
+# Rejestracja na EPIC ROLL, specyfikacja prototypu
 
 Stan na 21.10.2026 · Wojtek Mankowski
 
@@ -39,7 +39,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 
 | ID | Wymaganie | Źródło |
 | --- | --- | --- |
-| F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. | Wymaganie |
+| F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. Nagłówek strony i ekranu z ID to „EPIC ROLL”. | Wymaganie |
 | F2 | Strona sprawdza dane przed wysłaniem (reguły w sekcji „Walidacja i komunikaty”). Serwer sprawdza je ponownie. | Założenie |
 | F3 | Przycisk „Zarejestruj” blokuje się na czas wysyłania, żeby jedno kliknięcie dawało jeden wiersz. | Założenie |
 | F4 | Jedno zamówienie może obejmować kilka osób o różnych imionach i nazwiskach. Duplikat to wiersz z tym samym numerem zamówienia i tym samym „Imię I.” (bez rozróżniania wielkości liter). Serwer przed porównaniem usuwa spacje z numeru. | Wymaganie |
@@ -168,7 +168,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 ## Otwarte pytania
 
 - [ ] Czy numer spoza listy biletów ma blokować rejestrację? Teraz rejestracja przechodzi z wpisem „brak na liście”.
-- [ ] Nazwa, data i miejsce wydarzenia (tekst na stronie i slug w kluczu localStorage).
+- [ ] Data i miejsce EPIC ROLL (tekst pod nagłówkiem strony).
 - [ ] Ile osób się spodziewacie i w jakim oknie czasowym rejestrują się najczęściej?
 - [ ] Czy ID (Lp) ma zaczynać się od 1, czy od innej liczby (np. 100, żeby każde ID miało trzy cyfry)?
 - [ ] Kto jest administratorem danych i kiedy usuwacie arkusz po wydarzeniu?

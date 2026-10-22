@@ -1,4 +1,4 @@
-# Rejestracja na wydarzenie, plan działania
+# Rejestracja na EPIC ROLL, plan działania
 
 Stan na 21.10.2026 · Wojtek Mankowski
 
@@ -18,7 +18,7 @@ M3 i M4 są od siebie niezależne i mogą iść równolegle, bo strona testuje l
 
 ## M1. Arkusz i dane testowe
 
-1. Zebrać od organizatora odpowiedzi na pozostałe otwarte pytania ze SPEC.md (m.in. czy numer spoza listy ma blokować rejestrację, nazwa i data wydarzenia, liczba uczestników). Na pokaz wystarczą założenia ze SPEC.md.
+1. Zebrać od organizatora odpowiedzi na pozostałe otwarte pytania ze SPEC.md (m.in. czy numer spoza listy ma blokować rejestrację, data i miejsce wydarzenia, liczba uczestników). Na pokaz wystarczą założenia ze SPEC.md.
 2. Utworzyć arkusz testowy z kartą „Rejestracje”: kolumny A–I według SPEC.md, kolumna D w formacie tekstu, lista rozwijana w G (Na terenie, Wyszedł na stałe), format `yyyy-mm-dd hh:mm` w H i I, zamrożony wiersz 1.
 3. Utworzyć osobny arkusz testowy z listą biletów, z tymi samymi nagłówkami co arkusz obsługi, i wpisać 10 wierszy testowych z pełnym imieniem i nazwiskiem, w tym jedno zamówienie z dwiema osobami i jeden wiersz bez ksywy.
 4. Włączyć ochronę zakresów A:E i H:I na karcie „Rejestracje”.
