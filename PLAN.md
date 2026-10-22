@@ -46,7 +46,7 @@ Testy:
 
 ## M3. API w Apps Script
 
-1. Funkcje czyste: walidacja trzech pól, pułapka `website`, usuwanie spacji z numeru. Warunkowy eksport, żeby dało się je testować w Node.
+1. Funkcje czyste: walidacja trzech pól, pułapka `website`, usuwanie spacji z numeru. Osobny plik `apps-script/validation.js`; testy ładują go w Node jako zwykły skrypt.
 2. Odczyt kolumn A, B i D oraz wykrywanie duplikatu: ten sam numer i to samo „Imię I.”.
 3. Wyszukiwanie ksywy i typu biletu w arkuszu z listą biletów (kolumny rozpoznawane po nagłówkach) po numerze, imieniu i inicjale nazwiska; brak dopasowania daje pustą ksywę i „brak na liście”.
 4. Nadanie Lp (największa wartość w A + 1) i zapis wiersza pod blokadą `LockService`, ze „Status” = „Na terenie” i bieżącą datą w „Data wejścia”.

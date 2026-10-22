@@ -25,17 +25,20 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 ├── apps-script/
 │   ├── .clasp.json                scriptId projektu Apps Script
 │   ├── appsscript.json            manifest: strefa czasowa, V8, ustawienia aplikacji internetowej
-│   └── Code.js                    doPost i funkcje pomocnicze
+│   ├── Code.js                    doPost i funkcje pomocnicze
+│   ├── validation.js              walidacja żądania (funkcje bez efektów ubocznych)
+│   └── validation.test.js         testy Vitest, ładują validation.js w Node
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    stan ekranu i przejścia
 │   ├── api.ts                     wywołanie API, typy żądania i odpowiedzi, ponawianie
 │   ├── storage.ts                 odczyt i zapis localStorage w try/catch
-│   ├── validation.ts              reguły pól (te same co w Code.js)
+│   ├── validation.ts              reguły pól (te same co w apps-script/validation.js)
 │   ├── components/
 │   │   ├── RegistrationForm.tsx
 │   │   └── IdScreen.tsx
 │   └── index.css                  @import "tailwindcss";
+├── test-data/validation-cases.json  przypadki testowe walidacji, wspólne dla API i strony
 ├── .env.production                VITE_API_URL=<adres /exec aplikacji Apps Script>
 ├── index.html
 ├── vite.config.ts                 base: '/<repo>/', wtyczki react i tailwindcss
@@ -102,7 +105,7 @@ Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`
 
 ### Walidacja
 
-`validation.ts` i `Code.js` mają te same wyrażenia regularne. Przy zmianie reguły trzeba poprawić oba pliki.
+`src/validation.ts` i `apps-script/validation.js` mają te same wyrażenia regularne i przechodzą te same przypadki z `test-data/validation-cases.json`. Przy zmianie reguły trzeba poprawić oba pliki i przypadki testowe.
 
 | Pole | Wyrażenie |
 | --- | --- |
@@ -197,7 +200,7 @@ Wyzwalacz instalowany działa z uprawnieniami osoby, która go utworzyła, więc
 1. Włącz „Google Apps Script API” w ustawieniach użytkownika Apps Script (script.google.com, Ustawienia).
 2. `npm install -g @google/clasp`, potem `clasp login`.
 3. W katalogu `apps-script/`: `clasp create --type standalone --title "Rejestracja API"` (albo `clasp clone <scriptId>` dla istniejącego projektu).
-4. `clasp push` wysyła `Code.js` i `appsscript.json`.
+4. `clasp push` wysyła pliki `.js` i `appsscript.json` (testy pomija `.claspignore`).
 5. Pierwsze wdrożenie w edytorze: Wdróż → Nowe wdrożenie → „Aplikacja internetowa”. Zapisz identyfikator wdrożenia i adres `/exec` w `.env.production`.
 6. Kolejne zmiany: `clasp push`, potem `clasp deploy -i <deploymentId>`. Aktualizacja istniejącego wdrożenia zachowuje adres URL, więc strona nie wymaga zmian.
 
