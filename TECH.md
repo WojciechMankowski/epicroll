@@ -49,7 +49,8 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── validation.ts              reguły pól (te same co w apps-script/validation.js)
 │   ├── components/
 │   │   ├── RegistrationForm.tsx
-│   │   └── IdScreen.tsx           ekran z ID: numer w obrysie kostki k20 (SVG), osoba, godzina rejestracji
+│   │   ├── IdScreen.tsx           ekran z ID: numer w obrysie kostki k20 (SVG), osoba, godzina rejestracji
+│   │   └── ErrorScreen.tsx        ekran błędu: tytuł, komunikat, wpisane dane, „Spróbuj ponownie” / „Popraw dane”
 │   └── index.css                  @import "tailwindcss";
 ├── test-data/validation-cases.json  przypadki testowe walidacji, wspólne dla API i strony
 ├── .env.production                VITE_API_URL=<adres /exec aplikacji Apps Script>

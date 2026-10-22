@@ -1,7 +1,8 @@
+import { ErrorScreen } from './components/ErrorScreen'
 import { IdScreen } from './components/IdScreen'
 import { RegistrationForm } from './components/RegistrationForm'
 import { EVENT_DATE, EVENT_NAME, EVENT_PLACE } from './event'
-import { ERROR_MESSAGES, useRegistration, type RegistrationDeps } from './useRegistration'
+import { useRegistration, type RegistrationDeps } from './useRegistration'
 
 // Ekrany: formularz (M5.1), ekran z ID (M5.2), ekran błędu (M5.3).
 
@@ -24,17 +25,12 @@ export default function App({ deps }: Props) {
       {state.screen === 'done' && <IdScreen registration={state.registration} saved={state.saved} />}
 
       {state.screen === 'error' && (
-        <section aria-label="Błąd rejestracji" className="flex flex-col gap-3">
-          <p role="alert">{ERROR_MESSAGES[state.error]}</p>
-          {state.error !== 'DUPLICATE' && (
-            <button type="button" className="min-h-11 rounded border px-4" onClick={() => void retry()}>
-              Spróbuj ponownie
-            </button>
-          )}
-          <button type="button" className="min-h-11 rounded border px-4" onClick={backToForm}>
-            Popraw dane
-          </button>
-        </section>
+        <ErrorScreen
+          error={state.error}
+          values={state.values}
+          onRetry={() => void retry()}
+          onEdit={backToForm}
+        />
       )}
 
       {(state.screen === 'form' || state.screen === 'sending') && (

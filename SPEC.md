@@ -131,10 +131,10 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | --- | --- |
 | Trwa wysyłanie | przycisk zablokowany, tekst „Rejestruję…” |
 | `ok: true` | ekran z ID (F10) |
-| `DUPLICATE` | „Ta osoba jest już zarejestrowana z tym numerem zamówienia. Podejdź do obsługi.” + przycisk „Popraw dane” (powrót do formularza, np. przy literówce) |
+| `DUPLICATE` | tytuł „Ta rejestracja już istnieje”, komunikat „Ta osoba jest już zarejestrowana z tym numerem zamówienia. Podejdź do obsługi.”, wpisane dane, przycisk „Popraw dane” (powrót do formularza, np. przy literówce) |
 | `VALIDATION` | komunikat przy wskazanym polu |
-| `BUSY` | „Wiele osób rejestruje się naraz. Spróbuj za chwilę.” + przycisk „Spróbuj ponownie” |
-| `SERVER` lub brak sieci | „Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.” + przycisk „Spróbuj ponownie” |
+| `BUSY` | tytuł „Wiele zgłoszeń naraz”, komunikat „Wiele osób rejestruje się naraz. Spróbuj za chwilę.”, wpisane dane, przyciski „Spróbuj ponownie” i „Popraw dane” |
+| `SERVER` lub brak sieci | tytuł „Zgłoszenie nie dotarło”, komunikat „Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.”, wpisane dane, przyciski „Spróbuj ponownie” i „Popraw dane” |
 
 ## Wymagania niefunkcjonalne i ryzyka
 
