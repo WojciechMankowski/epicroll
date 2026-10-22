@@ -50,6 +50,7 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── components/
 │   │   ├── RegistrationForm.tsx
 │   │   ├── IdScreen.tsx           ekran z ID: numer w obrysie kostki k20 (SVG), osoba, godzina rejestracji
+│   │   ├── DataNotice.tsx         informacja o przetwarzaniu danych pod formularzem (N6), składana z pól w event.ts
 │   │   └── ErrorScreen.tsx        ekran błędu: tytuł, komunikat, wpisane dane, „Spróbuj ponownie” / „Popraw dane”
 │   └── index.css                  @import "tailwindcss";
 ├── test-data/validation-cases.json  przypadki testowe walidacji, wspólne dla API i strony

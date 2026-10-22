@@ -145,7 +145,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | N3 | Każde pole ma etykietę `<label>`; numer ID na ekranie końcowym ma co najmniej 72 px. |
 | N4 | Interfejs po polsku. |
 | N5 | Pojedyncza rejestracja trwa około 3 s. Przy 25 równoległych rejestracjach wszystkie się zapisują; pomiar T7 z 22.10.2026: mediana 6,1 s, najdłużej 15,2 s, całość 22 s. Strona czeka na odpowiedź do 30 s i przez ten czas pokazuje „Rejestruję…”. Limit Apps Script to 30 równoczesnych wykonań. |
-| N6 | Pod formularzem krótka informacja o przetwarzaniu danych: kto zbiera, w jakim celu, kiedy usunie. Treść zatwierdza organizator jako administrator danych. |
+| N6 | Pod formularzem krótka informacja o przetwarzaniu danych: kto zbiera, w jakim celu, kiedy usunie. Treść zatwierdza organizator jako administrator danych. Wersja robocza: administrator, termin usunięcia i kontakt są w `src/event.ts` (`DATA_CONTROLLER`, `DATA_RETENTION`, `DATA_CONTACT`) i na razie są puste; puste pola pomijają swoje zdania. |
 
 | Ryzyko | Skutek | Środek zaradczy |
 | --- | --- | --- |

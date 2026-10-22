@@ -49,6 +49,14 @@ describe('App', () => {
     expect(header).toHaveTextContent('Szkoły Okrętowe i Techniczne Conradinum, Gdańsk')
   })
 
+  it('informacja o danych jest pod formularzem, a nie na ekranie z ID (N6)', async () => {
+    render(<App deps={{ register: fakeRegister(success), storage: memoryStorage() }} />)
+    expect(screen.getByTestId('data-notice')).toBeInTheDocument()
+    await fillAndSubmit()
+    await screen.findByTestId('registration-id')
+    expect(screen.queryByTestId('data-notice')).not.toBeInTheDocument()
+  })
+
   it('wpis w localStorage przy starcie: ekran z ID bez formularza i bez wywołania API (T2)', () => {
     const register = fakeRegister()
     const storage = memoryStorage({ 'rejestracja-epic-roll-v1': JSON.stringify(stored) })

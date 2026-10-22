@@ -1,3 +1,4 @@
+import { DataNotice } from './components/DataNotice'
 import { ErrorScreen } from './components/ErrorScreen'
 import { IdScreen } from './components/IdScreen'
 import { RegistrationForm } from './components/RegistrationForm'
@@ -44,6 +45,7 @@ export default function App({ deps }: Props) {
             sending={state.screen === 'sending'}
             onSubmit={(values, website) => void submit(values, website)}
           />
+          <DataNotice />
         </section>
       )}
     </main>
