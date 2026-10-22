@@ -8,5 +8,7 @@ function diagnoza() {
   const values = env.readTicketValues();
   console.log('Kolumny bazy biletów: ' + JSON.stringify(findColumns(values[0])));
   console.log('Wiersze w bazie biletów (bez nagłówka): ' + (values.length - 1));
+  const triggers = ScriptApp.getProjectTriggers().map((t) => t.getHandlerFunction());
+  console.log('Wyzwalacze: ' + (triggers.length ? triggers.join(', ') : 'brak (uruchom installTriggers)'));
   console.log('Wszystko gotowe');
 }

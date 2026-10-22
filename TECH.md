@@ -34,7 +34,10 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── tickets.js                 wyszukiwanie ksywy i typu biletu w liście biletów
 │   ├── tickets.test.js
 │   ├── register.js                nadanie Lp i zapis wiersza pod blokadą (registerPerson)
-│   └── register.test.js
+│   ├── register.test.js
+│   ├── triggers.js                installTriggers, onStatusEdit: data wyjścia po zmianie „Status”
+│   ├── triggers.test.js
+│   └── diagnoza.js                sprawdzenie konfiguracji z edytora Apps Script
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    stan ekranu i przejścia
@@ -174,25 +177,12 @@ Nieprzewidziany wyjątek (także brak `SHEET_ID`, `TICKETS_SHEET_ID` albo karty 
 
 ### Data wyjścia: wyzwalacz przy edycji
 
-Skrypt jest samodzielny (nie jest przypięty do arkusza), więc prosty wyzwalacz `onEdit` nie zadziała. Funkcja `installTriggers()`, uruchomiona raz z edytora, tworzy wyzwalacz instalowany dla arkusza:
+Skrypt jest samodzielny (nie jest przypięty do arkusza), więc prosty wyzwalacz `onEdit` nie zadziała. Kod jest w `apps-script/triggers.js`:
 
-```js
-function installTriggers() {
-  const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-  ScriptApp.newTrigger('onStatusEdit').forSpreadsheet(id).onEdit().create();
-}
+- `installTriggers()`, uruchomiona raz z edytora, usuwa wcześniejsze wyzwalacze `onStatusEdit` i tworzy jeden wyzwalacz instalowany przy edycji arkusza `SHEET_ID`.
+- `onStatusEdit(e)` reaguje tylko na pojedynczą komórkę kolumny G karty „Rejestracje” poniżej nagłówka: „Wyszedł na stałe” wpisuje bieżącą datę do I, „Na terenie” czyści I, inne wartości nic nie zmieniają.
 
-function onStatusEdit(e) {
-  const range = e.range;
-  if (range.getSheet().getName() !== 'Rejestracje') return;
-  if (range.getColumn() !== 7 || range.getRow() < 2 || range.getNumRows() !== 1) return;
-  const exit = range.offset(0, 2); // kolumna I
-  if (e.value === 'Wyszedł na stałe') exit.setValue(new Date());
-  else if (e.value === 'Na terenie') exit.clearContent();
-}
-```
-
-Wyzwalacz instalowany działa z uprawnieniami osoby, która go utworzyła, więc zapisze kolumnę I mimo ochrony H:I. Po zmianie `SHEET_ID` na inny arkusz trzeba usunąć stary wyzwalacz i uruchomić `installTriggers()` ponownie. Wklejenie wartości do wielu komórek G naraz nie wypełnia dat (warunek `getNumRows() !== 1`); obsługa zmienia status pojedynczo.
+Wyzwalacz instalowany działa z uprawnieniami osoby, która go utworzyła, więc zapisze kolumnę I mimo ochrony H:I. Uruchamia się tylko przy edycji przez człowieka; zapis wiersza przez `doPost` go nie wywołuje. Po zmianie `SHEET_ID` na inny arkusz trzeba ponownie uruchomić `installTriggers()`. Wklejenie wartości do wielu komórek G naraz nie wypełnia dat; obsługa zmienia status pojedynczo. Funkcja `diagnoza` pokazuje listę ustawionych wyzwalaczy.
 
 ### Ograniczenia Apps Script
 

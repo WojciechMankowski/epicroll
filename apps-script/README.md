@@ -36,6 +36,10 @@ Identyfikator to fragment adresu arkusza między `/d/` a `/edit`. Zmiana właśc
 
 Kolejne zmiany kodu: `clasp push`, potem w edytorze Wdróż → Zarządzaj wdrożeniami → edycja istniejącego wdrożenia → Wersja: „Nowa wersja”. Adres `/exec` się nie zmienia. Samo `clasp push` nie zmienia działającego wdrożenia.
 
+## Wyzwalacz daty wyjścia
+
+Raz po pierwszym wdrożeniu (i po każdej zmianie `SHEET_ID`): w edytorze wybierz funkcję `installTriggers` i kliknij „Uruchom”. Google poprosi o dodatkowe uprawnienie do zarządzania wyzwalaczami. Od tej chwili zmiana „Status” na „Wyszedł na stałe” w karcie „Rejestracje” wpisuje datę wyjścia, a powrót do „Na terenie” ją czyści.
+
 ## Sprawdzenie
 
 Konfiguracja: w edytorze wybierz funkcję `diagnoza` (plik `diagnoza.js`) i kliknij „Uruchom”. Dziennik wykonywania pokazuje właściwości, nazwę karty obsługi i kolumny bazy biletów; brak czegokolwiek kończy się błędem z opisem. Funkcja niczego nie zapisuje.
