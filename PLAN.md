@@ -2,7 +2,7 @@
 
 Stan na 21.10.2026 · Wojtek Mankowski
 
-Prototyp na pokaz w niedzielę 25.10.2026. Działa na arkuszu testowym, przyjmuje założenia ze SPEC.md: numer zamówienia ma 7 cyfr, jedno zamówienie może obejmować kilka osób, a osobny arkusz z listą biletów ma 10 testowych wierszy. Każdy kamień milowy kończy się testami. Zadania i testy są założone jako issues na GitHubie, przypisane do kamieni milowych M1–M6.
+Prototyp na pokaz w niedzielę 25.10.2026. Samo wydarzenie EPIC ROLL odbywa się 5.12.2026 w Szkołach Okrętowych i Technicznych Conradinum w Gdańsku. Działa na arkuszu testowym, przyjmuje założenia ze SPEC.md: numer zamówienia ma 7 cyfr, jedno zamówienie może obejmować kilka osób, a osobny arkusz z listą biletów ma 10 testowych wierszy. Każdy kamień milowy kończy się testami. Zadania i testy są założone jako issues na GitHubie, przypisane do kamieni milowych M1–M6.
 
 ## Harmonogram
 
@@ -18,7 +18,7 @@ M3 i M4 są od siebie niezależne i mogą iść równolegle, bo strona testuje l
 
 ## M1. Arkusz i dane testowe
 
-1. Zebrać od organizatora odpowiedzi na pozostałe otwarte pytania ze SPEC.md (m.in. czy numer spoza listy ma blokować rejestrację, data i miejsce wydarzenia, liczba uczestników). Na pokaz wystarczą założenia ze SPEC.md.
+1. Zebrać od organizatora odpowiedzi na pozostałe otwarte pytania ze SPEC.md (m.in. czy numer spoza listy ma blokować rejestrację, liczba uczestników). Na pokaz wystarczą założenia ze SPEC.md.
 2. Utworzyć arkusz testowy z kartą „Rejestracje”: kolumny A–I według SPEC.md, kolumna D w formacie tekstu, lista rozwijana w G (Na terenie, Wyszedł na stałe), format `yyyy-mm-dd hh:mm` w H i I, zamrożony wiersz 1.
 3. Utworzyć osobny arkusz testowy z listą biletów, z tymi samymi nagłówkami co arkusz obsługi, i wpisać 10 wierszy testowych z pełnym imieniem i nazwiskiem, w tym jedno zamówienie z dwiema osobami i jeden wiersz bez ksywy.
 4. Włączyć ochronę zakresów A:E i H:I na karcie „Rejestracje”.

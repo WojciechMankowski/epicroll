@@ -39,7 +39,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 
 | ID | Wymaganie | Źródło |
 | --- | --- | --- |
-| F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. Nagłówek strony i ekranu z ID to „EPIC ROLL”. | Wymaganie |
+| F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. Nagłówek strony i ekranu z ID to „EPIC ROLL”, pod nim „5 grudnia 2026 · Szkoły Okrętowe i Techniczne Conradinum, Gdańsk”. | Wymaganie |
 | F2 | Strona sprawdza dane przed wysłaniem (reguły w sekcji „Walidacja i komunikaty”). Serwer sprawdza je ponownie. | Założenie |
 | F3 | Przycisk „Zarejestruj” blokuje się na czas wysyłania, żeby jedno kliknięcie dawało jeden wiersz. | Założenie |
 | F4 | Jedno zamówienie może obejmować kilka osób o różnych imionach i nazwiskach. Duplikat to wiersz z tym samym numerem zamówienia i tym samym „Imię I.” (bez rozróżniania wielkości liter). Serwer przed porównaniem usuwa spacje z numeru. | Wymaganie |
@@ -68,8 +68,8 @@ Karta „Rejestracje”:
 | E | Typ Biletu | wartość z arkusza z listą biletów albo „brak na liście” | skrypt | (wartość z listy biletów) |
 | F | Działanie | wolny tekst | obsługa | (uwagi obsługi) |
 | G | Status | lista rozwijana: Na terenie, Wyszedł na stałe | skrypt przy rejestracji („Na terenie”), potem obsługa | Na terenie |
-| H | Data przyjścia | data i godzina, format `yyyy-mm-dd hh:mm`, strefa Europe/Warsaw | skrypt przy rejestracji | 2026-10-25 10:42 |
-| I | Data wyjścia | data i godzina, ten sam format | skrypt po zmianie „Status” na „Wyszedł na stałe” | 2026-10-25 18:05 |
+| H | Data przyjścia | data i godzina, format `yyyy-mm-dd hh:mm`, strefa Europe/Warsaw | skrypt przy rejestracji | 2026-12-05 10:42 |
+| I | Data wyjścia | data i godzina, ten sam format | skrypt po zmianie „Status” na „Wyszedł na stałe” | 2026-12-05 18:05 |
 
 Arkusz z listą biletów (osobny plik, pierwsza karta, jedna osoba w wierszu). Skrypt czyta kolumny B–E, pozostałe pomija:
 
@@ -107,7 +107,7 @@ Apps Script zawsze zwraca HTTP 200, więc wynik niesie pole `ok` i kod `error`.
 
 | Sytuacja | Odpowiedź |
 | --- | --- |
-| Zapisano | `{"ok":true,"id":17,"nickname":"<ksywa z listy>","ticketType":"<typ z listy>","registeredAt":"2026-11-14T09:42:05+01:00"}` |
+| Zapisano | `{"ok":true,"id":17,"nickname":"<ksywa z listy>","ticketType":"<typ z listy>","registeredAt":"2026-12-05T09:42:05+01:00"}` |
 | Zapisano, numeru nie ma na liście biletów | `{"ok":true,"id":18,"nickname":null,"ticketType":null,"registeredAt":"…"}` |
 | Numer i „Imię I.” już zarejestrowane | `{"ok":false,"error":"DUPLICATE"}` |
 | Błędne dane | `{"ok":false,"error":"VALIDATION","field":"orderNumber"}` |
@@ -168,7 +168,6 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 ## Otwarte pytania
 
 - [ ] Czy numer spoza listy biletów ma blokować rejestrację? Teraz rejestracja przechodzi z wpisem „brak na liście”.
-- [ ] Data i miejsce EPIC ROLL (tekst pod nagłówkiem strony).
 - [ ] Ile osób się spodziewacie i w jakim oknie czasowym rejestrują się najczęściej?
 - [ ] Czy ID (Lp) ma zaczynać się od 1, czy od innej liczby (np. 100, żeby każde ID miało trzy cyfry)?
 - [ ] Kto jest administratorem danych i kiedy usuwacie arkusz po wydarzeniu?
