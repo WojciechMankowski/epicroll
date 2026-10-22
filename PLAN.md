@@ -2,7 +2,7 @@
 
 Stan na 21.10.2026 · Wojtek Mankowski
 
-Prototyp na pokaz w niedzielę 25.10.2026. Działa na arkuszu testowym, przyjmuje założenia ze SPEC.md: numer zamówienia to same cyfry, jedno zamówienie może obejmować kilka osób, a karta „Bilety” ma 10 testowych wierszy. Każdy kamień milowy kończy się testami. Zadania i testy są założone jako issues na GitHubie, przypisane do kamieni milowych M1–M6.
+Prototyp na pokaz w niedzielę 25.10.2026. Działa na arkuszu testowym, przyjmuje założenia ze SPEC.md: numer zamówienia to same cyfry, jedno zamówienie może obejmować kilka osób, a osobny arkusz z listą biletów ma 10 testowych wierszy. Każdy kamień milowy kończy się testami. Zadania i testy są założone jako issues na GitHubie, przypisane do kamieni milowych M1–M6.
 
 ## Harmonogram
 
@@ -18,15 +18,15 @@ M3 i M4 są od siebie niezależne i mogą iść równolegle, bo strona testuje l
 
 ## M1. Arkusz i dane testowe
 
-1. Zebrać od organizatora odpowiedzi na otwarte pytania: czy numer ma stałą liczbę cyfr, gdzie są lista biletów i ksywy (pliki, kolumny). Na pokaz wystarczą założenia ze SPEC.md.
+1. Zebrać od organizatora odpowiedzi na otwarte pytania: czy numer ma stałą liczbę cyfr, kto i jak często aktualizuje arkusz z listą biletów. Na pokaz wystarczą założenia ze SPEC.md.
 2. Utworzyć arkusz testowy z kartą „Rejestracje”: kolumny A–I według SPEC.md, kolumna D w formacie tekstu, lista rozwijana w G (Na terenie, Wyszedł na stałe), format `yyyy-mm-dd hh:mm` w H i I, zamrożony wiersz 1.
-3. Dodać kartę „Bilety” z kolumnami Nr Zamówienia, Imię i nazwisko, Typ Biletu, Ksywa i wpisać 10 wierszy testowych, w tym jedno zamówienie z dwiema osobami i jeden wiersz bez ksywy.
+3. Utworzyć osobny arkusz testowy z listą biletów, z tymi samymi nagłówkami co arkusz obsługi, i wpisać 10 wierszy testowych z pełnym imieniem i nazwiskiem, w tym jedno zamówienie z dwiema osobami i jeden wiersz bez ksywy.
 4. Włączyć ochronę zakresów A:E i H:I na karcie „Rejestracje”.
 
 Testy:
 
 - Numer wpisany do kolumny D zostaje tekstem, nie zamienia się na liczbę ani notację wykładniczą.
-- Nagłówki obu kart zgadzają się ze SPEC.md znak w znak.
+- Nagłówki obu arkuszy zgadzają się ze SPEC.md znak w znak.
 - Osoba bez uprawnień właściciela nie zmieni ręcznie komórek A:E ani H:I, ale może zmienić F i G.
 - Lista rozwijana w G przyjmuje tylko „Na terenie” i „Wyszedł na stałe”.
 
@@ -48,10 +48,10 @@ Testy:
 
 1. Funkcje czyste: walidacja trzech pól, pułapka `website`, usuwanie spacji z numeru. Warunkowy eksport, żeby dało się je testować w Node.
 2. Odczyt kolumn A, B i D oraz wykrywanie duplikatu: ten sam numer i to samo „Imię I.”.
-3. Wyszukiwanie ksywy i typu biletu na karcie „Bilety” po numerze, imieniu i inicjale nazwiska; brak dopasowania daje pustą ksywę i „brak na liście”.
+3. Wyszukiwanie ksywy i typu biletu w arkuszu z listą biletów po numerze, imieniu i inicjale nazwiska; brak dopasowania daje pustą ksywę i „brak na liście”.
 4. Nadanie Lp (największa wartość w A + 1) i zapis wiersza pod blokadą `LockService`, ze „Status” = „Na terenie” i bieżącą datą w „Data przyjścia”.
 5. Funkcja `json()`, `try/catch` wokół `doPost`, logowanie błędów.
-6. `SHEET_ID` we Właściwościach skryptu, wdrożenie jako aplikacja internetowa.
+6. `SHEET_ID` i `TICKETS_SHEET_ID` we Właściwościach skryptu, wdrożenie jako aplikacja internetowa.
 7. Wyzwalacz instalowany `onStatusEdit`: „Wyszedł na stałe” w G wpisuje datę do I, „Na terenie” czyści I. Funkcja `installTriggers()` uruchomiona raz.
 
 Testy:

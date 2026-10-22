@@ -45,7 +45,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 | F4 | Jedno zamówienie może obejmować kilka osób o różnych imionach i nazwiskach. Duplikat to wiersz z tym samym numerem zamówienia i tym samym „Imię I.” (bez rozróżniania wielkości liter). Serwer przed porównaniem usuwa spacje z numeru. | Wymaganie |
 | F5 | Gdy para numer + „Imię I.” już jest w arkuszu, serwer odrzuca zgłoszenie, a strona pokazuje komunikat z prośbą o kontakt z obsługą. Nowy wiersz nie powstaje. | Wymaganie |
 | F6 | Gdy takiej pary nie ma, serwer nadaje kolejny numer ID (kolumna „Lp”: 1, 2, 3…), dopisuje wiersz i zwraca ID. | Wymaganie |
-| F7 | Serwer szuka na karcie „Bilety” (lista wszystkich biletów) wiersza z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od podanego inicjału. Z tego wiersza wpisuje ksywę do kolumny „Ksywa”, a typ do kolumny „Typ Biletu”. Gdy takiego wiersza nie ma, „Ksywa” zostaje pusta, „Typ Biletu” dostaje „brak na liście”, a rejestracja przechodzi. | Wymaganie (zachowanie przy braku: założenie) |
+| F7 | Serwer szuka w osobnym arkuszu z listą biletów wiersza z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od podanego inicjału. Z tego wiersza wpisuje ksywę do kolumny „Ksywa”, a typ do kolumny „Typ Biletu”. Gdy takiego wiersza nie ma, „Ksywa” zostaje pusta, „Typ Biletu” dostaje „brak na liście”, a rejestracja przechodzi. | Wymaganie (zachowanie przy braku: założenie) |
 | F8 | Strona zapisuje w localStorage ID, numer zamówienia, imię, inicjał, ksywę, typ biletu i czas rejestracji. | Wymaganie |
 | F9 | Przy ponownym wejściu strona odczytuje localStorage i od razu pokazuje ekran z ID, bez formularza i bez wywołania serwera. | Wymaganie |
 | F10 | Ekran z ID pokazuje duży numer ID, „Imię I.”, ksywę, numer zamówienia, typ biletu i instrukcję „Pokaż ten ekran obsłudze”. Działa bez internetu. | Wymaganie |
@@ -55,7 +55,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 
 ## Struktura arkusza Google
 
-Jeden plik, dwie karty. Karta „Rejestracje” ma układ podany przez organizatora: wiersz 1 to nagłówki, każdy kolejny wiersz to jedna rejestracja. Przy rejestracji skrypt wypełnia kolumny A–E, G i H. Obsługa wpisuje „Działanie” (F) i zmienia „Status” (G); zmiana na „Wyszedł na stałe” wypełnia „Data wyjścia” (I). Karta „Bilety” to lista wszystkich biletów, z której skrypt bierze ksywę i typ biletu.
+Dwa osobne pliki Google Sheets: arkusz obsługi z kartą „Rejestracje” i arkusz z listą biletów. Karta „Rejestracje” ma układ podany przez organizatora: wiersz 1 to nagłówki, każdy kolejny wiersz to jedna rejestracja. Przy rejestracji skrypt wypełnia kolumny A–E, G i H. Obsługa wpisuje „Działanie” (F) i zmienia „Status” (G); zmiana na „Wyszedł na stałe” wypełnia „Data wyjścia” (I). Arkusz z listą biletów ma te same nagłówki co arkusz obsługi; skrypt bierze z niego ksywę i typ biletu osoby i przepisuje je do arkusza obsługi.
 
 Karta „Rejestracje”:
 
@@ -63,24 +63,24 @@ Karta „Rejestracje”:
 | --- | --- | --- | --- | --- |
 | A | Lp | liczba całkowita, to jest ID pokazywane uczestnikowi | skrypt | 17 |
 | B | Imię i Nazwisko Podane w formularz | tekst „Imię I.” złożony z dwóch pól formularza | skrypt | Anna K. |
-| C | Ksywa | wartość z karty „Bilety”, pusta, gdy numeru nie ma na liście | skrypt | (wartość z listy biletów) |
+| C | Ksywa | wartość z arkusza z listą biletów, pusta, gdy osoby nie ma na liście | skrypt | (wartość z listy biletów) |
 | D | Nr Zamówienia | same cyfry, format „Zwykły tekst” | skrypt | 3012456 |
-| E | Typ Biletu | wartość z karty „Bilety” albo „brak na liście” | skrypt | (wartość z listy biletów) |
+| E | Typ Biletu | wartość z arkusza z listą biletów albo „brak na liście” | skrypt | (wartość z listy biletów) |
 | F | Działanie | wolny tekst | obsługa | (uwagi obsługi) |
 | G | Status | lista rozwijana: Na terenie, Wyszedł na stałe | skrypt przy rejestracji („Na terenie”), potem obsługa | Na terenie |
 | H | Data przyjścia | data i godzina, format `yyyy-mm-dd hh:mm`, strefa Europe/Warsaw | skrypt przy rejestracji | 2026-10-25 10:42 |
 | I | Data wyjścia | data i godzina, ten sam format | skrypt po zmianie „Status” na „Wyszedł na stałe” | 2026-10-25 18:05 |
 
-Karta „Bilety” (układ do potwierdzenia):
+Arkusz z listą biletów (osobny plik, pierwsza karta, jedna osoba w wierszu). Skrypt czyta kolumny B–E, pozostałe pomija:
 
-| Kolumna | Nagłówek | Typ | Wypełnia |
-| --- | --- | --- | --- |
-| A | Nr Zamówienia | same cyfry | import z systemu sprzedaży |
-| B | Imię i nazwisko | tekst, jedna osoba w wierszu | import z systemu sprzedaży |
-| C | Typ Biletu | tekst | import z systemu sprzedaży |
-| D | Ksywa | tekst | import z zapisów na sesje |
+| Kolumna | Nagłówek | Skrypt używa do |
+| --- | --- | --- |
+| B | Imię i Nazwisko Podane w formularz | dopasowania imienia i inicjału nazwiska |
+| C | Ksywa | przepisania do arkusza obsługi |
+| D | Nr Zamówienia | dopasowania numeru |
+| E | Typ Biletu | przepisania do arkusza obsługi |
 
-Pierwszy wiersz zamrożony na obu kartach. „Data przyjścia” to ten sam moment co `registeredAt` w odpowiedzi API. Ochrona zakresów A:E i H:I na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
+Pierwszy wiersz zamrożony w obu arkuszach. Skrypt tylko czyta arkusz z listą biletów. „Data przyjścia” to ten sam moment co `registeredAt` w odpowiedzi API. Ochrona zakresów A:E i H:I na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
 
 ## Kontrakt API
 
@@ -168,7 +168,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 ## Otwarte pytania
 
 - [ ] Czy numer zamówienia ma stałą liczbę cyfr? Teraz reguła przyjmuje 4–12 cyfr.
-- [ ] Gdzie leżą lista wszystkich biletów i ksywy z zapisów na sesje: w jednym pliku czy w dwóch, na których kartach, w których kolumnach są numer zamówienia, typ biletu i ksywa, kto i jak często je aktualizuje?
+- [ ] Kto i jak często aktualizuje arkusz z listą biletów?
 - [ ] Czy numer spoza listy biletów ma blokować rejestrację? Teraz rejestracja przechodzi z wpisem „brak na liście”.
 - [ ] Nazwa, data i miejsce wydarzenia (tekst na stronie i slug w kluczu localStorage).
 - [ ] Ile osób się spodziewacie i w jakim oknie czasowym rejestrują się najczęściej?
@@ -182,7 +182,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 ### Kolejność prac
 
 1. Utwórz arkusz z kartą „Rejestracje” (A–I: Lp, Imię i Nazwisko Podane w formularz, Ksywa, Nr Zamówienia, Typ Biletu, Działanie, Status, Data przyjścia, Data wyjścia), format tekstu w kolumnie D, lista rozwijana w G, format daty i godziny w H i I.
-2. Dodaj kartę „Bilety” i zaimportuj listę wszystkich biletów z ksywami.
+2. Przygotuj osobny arkusz z listą biletów (te same nagłówki co arkusz obsługi) i udostępnij go właścicielowi skryptu.
 3. Załóż repozytorium z projektem Vite (React + TypeScript) i Tailwind oraz katalogiem `apps-script/` pod clasp.
 4. Napisz `doPost`, wyślij go przez `clasp push`, wpisz `SHEET_ID` we Właściwościach skryptu, wdróż jako aplikację internetową.
 5. Sprawdź API z konsoli przeglądarki jednym `fetch` (sukces, duplikat, błędne dane, numer spoza listy).
@@ -196,7 +196,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 | ID | Scenariusz | Oczekiwany wynik |
 | --- | --- | --- |
-| T1 | Pierwsza rejestracja z numerem z listy biletów | ekran z ID = 1, nowy wiersz z ksywą i typem biletu z karty „Bilety”, „Status” = „Na terenie”, „Data przyjścia” = czas rejestracji |
+| T1 | Pierwsza rejestracja z numerem z listy biletów | ekran z ID = 1, nowy wiersz z ksywą i typem biletu z arkusza z listą biletów, „Status” = „Na terenie”, „Data przyjścia” = czas rejestracji |
 | T2 | Odświeżenie strony po rejestracji | ekran z tym samym ID, brak wywołania API |
 | T3 | Ten sam numer i to samo imię z inicjałem na innym telefonie | komunikat `DUPLICATE`, liczba wierszy bez zmian |
 | T4 | Ten sam numer ze spacją („3012 456”) i to samo imię z inicjałem | traktowany jak duplikat po usunięciu spacji |

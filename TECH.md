@@ -13,7 +13,7 @@ Wymagania i kontrakt API są w SPEC.md. Ten plik opisuje, z czego i jak prototyp
 | Hosting strony | GitHub Pages, publikacja przez GitHub Actions | statyczne pliki z katalogu `dist/` |
 | API | Google Apps Script (JavaScript, środowisko V8), aplikacja internetowa | walidacja serwerowa, duplikaty, nadanie ID, odczyt listy biletów, zapis |
 | Kod API | clasp (CLI Google do Apps Script) w tym samym repozytorium | wysyłanie kodu i wdrażanie z terminala |
-| Baza | Google Sheets, karty „Rejestracje” i „Bilety” | rejestracje, ksywy, typy biletów, uwagi obsługi |
+| Baza | Google Sheets: arkusz obsługi (karta „Rejestracje”) i osobny arkusz z listą biletów | rejestracje, ksywy, typy biletów, uwagi obsługi |
 
 Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapisane w `package-lock.json`. Kod Apps Script zostaje w JavaScript; TypeScript dotyczy tylko strony.
 
@@ -134,7 +134,7 @@ Tailwind v4 nie potrzebuje pliku konfiguracyjnego: wystarczy wtyczka `@tailwindc
 
 ### Konfiguracja
 
-Identyfikator arkusza leży we Właściwościach skryptu pod kluczem `SHEET_ID` i nie trafia do repozytorium. Skrypt otwiera arkusz przez `SpreadsheetApp.openById(SHEET_ID)`.
+Identyfikatory obu arkuszy leżą we Właściwościach skryptu i nie trafiają do repozytorium: `SHEET_ID` (arkusz obsługi, odczyt i zapis) i `TICKETS_SHEET_ID` (arkusz z listą biletów, tylko odczyt). Skrypt otwiera je przez `SpreadsheetApp.openById(...)`. Właściciel skryptu musi mieć dostęp co najmniej do odczytu arkusza z listą biletów.
 
 ### Logika `doPost(e)`
 
@@ -143,7 +143,7 @@ Identyfikator arkusza leży we Właściwościach skryptu pod kluczem `SHEET_ID` 
 3. Załóż blokadę `LockService.getScriptLock().tryLock(10000)`. Brak blokady → `BUSY`.
 4. Odczytaj kolumny A, B i D karty „Rejestracje” jednym `getValues()`.
 5. Jest wiersz z tym samym numerem w D (porównanie jako tekst, `String(v).trim()`) i tym samym „Imię I.” w B (bez rozróżniania wielkości liter) → zwolnij blokadę, zwróć `DUPLICATE`.
-6. Odczytaj kartę „Bilety” i znajdź wiersz z tym numerem, w którym imię zgadza się z podanym, a nazwisko zaczyna się od inicjału (porównanie bez wielkości liter, z polskimi znakami). Weź z niego ksywę i typ biletu. Brak → pusta ksywa i „brak na liście”.
+6. Odczytaj kolumny B–E pierwszej karty arkusza `TICKETS_SHEET_ID` i znajdź wiersz z tym numerem w D, w którym imię w B zgadza się z podanym, a nazwisko zaczyna się od inicjału (porównanie bez wielkości liter, z polskimi znakami). Weź z niego ksywę (C) i typ biletu (E). Odczyt listy może być przed założeniem blokady, bo skrypt jej nie zmienia. Brak → pusta ksywa i „brak na liście”.
 7. Nowe ID = największa wartość w kolumnie A + 1 (działa także po ręcznym usunięciu wiersza).
 8. `appendRow([id, "Anna K.", ksywa, numer, typBiletu, "", "Na terenie", teraz, ""])`, gdzie `teraz = new Date()`, potem `SpreadsheetApp.flush()`.
 9. Zwolnij blokadę (`finally`), zwróć `ok: true` z ID, ksywą, typem biletu i `registeredAt` równym `teraz`.
