@@ -41,7 +41,8 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 ├── scripts/api-test.mjs           testy M3.T działającego API: npm run test:api -- <adres /exec>
 ├── src/
 │   ├── main.tsx
-│   ├── App.tsx                    stan ekranu i przejścia
+│   ├── App.tsx                    widok ekranów (formularz, wysyłanie, ekran z ID, błąd)
+│   ├── useRegistration.ts         stany ekranu i przejścia, komunikaty błędów
 │   ├── api.ts                     wywołanie API, typy żądania i odpowiedzi, ponawianie
 │   ├── storage.ts                 odczyt i zapis localStorage w try/catch
 │   ├── validation.ts              reguły pól (te same co w apps-script/validation.js)
@@ -101,14 +102,14 @@ Limit czasu: `api.ts` czeka na odpowiedź do 30 s (`AbortController`). Krótszy 
 
 Ponawianie: przy `BUSY` albo błędzie sieci `registerAttendee` w `api.ts` ponawia żądanie automatycznie do 2 razy, po 1 s i po 2 s. Przekroczenia limitu czasu nie ponawia i zwraca `SERVER`. Odpowiedź, która nie jest JSON-em albo nie ma kształtu z kontraktu (`parseResponse`), też daje `SERVER`. Gdy nadal się nie uda, strona pokazuje komunikat i przycisk „Spróbuj ponownie”. `DUPLICATE` i `VALIDATION` nie są ponawiane.
 
-### Stany ekranu w `App.tsx`
+### Stany ekranu (`useRegistration.ts`)
 
 | Stan | Kiedy | Co widać |
 | --- | --- | --- |
 | `form` | brak wpisu w localStorage | formularz z trzema polami |
 | `sending` | po kliknięciu „Zarejestruj” | zablokowany przycisk, „Rejestruję…” |
 | `done` | `ok: true` albo wpis w localStorage przy starcie | `IdScreen` |
-| `error` | `DUPLICATE`, `BUSY` lub `SERVER` po ponowieniach | komunikat, przy `BUSY`/`SERVER` przycisk „Spróbuj ponownie” |
+| `error` | `DUPLICATE`, `BUSY` lub `SERVER` po ponowieniach | komunikat, przy `BUSY`/`SERVER` przycisk „Spróbuj ponownie”, zawsze „Popraw dane” (powrót do formularza z wpisanymi danymi) |
 
 Błąd `VALIDATION` wraca do stanu `form` z komunikatem przy polu z `field`.
 

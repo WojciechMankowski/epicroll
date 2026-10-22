@@ -131,7 +131,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | --- | --- |
 | Trwa wysyłanie | przycisk zablokowany, tekst „Rejestruję…” |
 | `ok: true` | ekran z ID (F10) |
-| `DUPLICATE` | „Ten numer zamówienia jest już zarejestrowany. Podejdź do obsługi.” |
+| `DUPLICATE` | „Ta osoba jest już zarejestrowana z tym numerem zamówienia. Podejdź do obsługi.” + przycisk „Popraw dane” (powrót do formularza, np. przy literówce) |
 | `VALIDATION` | komunikat przy wskazanym polu |
 | `BUSY` | „Wiele osób rejestruje się naraz. Spróbuj za chwilę.” + przycisk „Spróbuj ponownie” |
 | `SERVER` lub brak sieci | „Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.” + przycisk „Spróbuj ponownie” |
