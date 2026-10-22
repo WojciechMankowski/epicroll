@@ -31,7 +31,9 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── registrations.js           odczyt karty „Rejestracje”, wykrywanie duplikatów
 │   ├── registrations.test.js
 │   ├── tickets.js                 wyszukiwanie ksywy i typu biletu w liście biletów
-│   └── tickets.test.js
+│   ├── tickets.test.js
+│   ├── register.js                nadanie Lp i zapis wiersza pod blokadą (registerPerson)
+│   └── register.test.js
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    stan ekranu i przejścia
@@ -66,7 +68,7 @@ export type RegisterSuccess = {
   id: number;
   nickname: string | null;
   ticketType: string | null;
-  registeredAt: string; // ISO 8601
+  registeredAt: string; // ISO 8601 w UTC, np. 2026-12-05T08:42:05.000Z; strona pokazuje czas polski
 };
 
 export type RegisterError = {
@@ -151,9 +153,11 @@ Identyfikatory obu arkuszy leżą we Właściwościach skryptu i nie trafiają d
 4. Odczytaj kolumny A, B i D karty „Rejestracje” jednym `getValues()`.
 5. Jest wiersz z tym samym numerem w D (porównanie jako tekst, `String(v).trim()`) i tą samą osobą w B → zwolnij blokadę, zwróć `DUPLICATE`. Osobę porównuje `personKey`: imiona i pierwsza litera ostatniego wyrazu, bez wielkości liter i nadmiarowych spacji. „Anna K.” i dopisana ręcznie „Anna Kowalska” to ta sama osoba (`apps-script/registrations.js`).
 6. Odczytaj pierwszą kartę arkusza `TICKETS_SHEET_ID` jednym `getDataRange().getValues()`. Z wiersza 1 ustal numery kolumn po nagłówkach (funkcja `findColumns`: nagłówek zaczynający się od „Imię i Nazwisko”, „Ksywa”, „Nr Zamówienia”, „Typ Biletu”; porównanie po `trim()` i bez wielkości liter). Znajdź wiersz z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od inicjału (porównanie po `trim()`, bez wielkości liter, z polskimi znakami). Weź z niego ksywę i typ biletu. Brak nagłówka → `SERVER` i `console.error` z jego nazwą. Odczyt listy może być przed założeniem blokady, bo skrypt jej nie zmienia. Brak → pusta ksywa i „brak na liście”.
-7. Nowe ID = największa wartość w kolumnie A + 1 (działa także po ręcznym usunięciu wiersza).
+7. Nowe ID = największa liczba w kolumnie A + 1, puste i nieliczbowe komórki pomijane (działa także po ręcznym usunięciu wiersza).
 8. `appendRow([id, "Anna K.", ksywa, numer, typBiletu, "", "Na terenie", teraz, ""])`, gdzie `teraz = new Date()`, potem `SpreadsheetApp.flush()`.
 9. Zwolnij blokadę (`finally`), zwróć `ok: true` z ID, ksywą, typem biletu i `registeredAt` równym `teraz`.
+
+Kroki 3–9 wykonuje `registerPerson(person, env)` w `apps-script/register.js`. Dostaje blokadę, kartę, odczyt listy biletów, zegar i `flush` przez `env`, więc testy podają atrapy zamiast usług Google.
 
 Każda odpowiedź przechodzi przez jedną funkcję pomocniczą:
 

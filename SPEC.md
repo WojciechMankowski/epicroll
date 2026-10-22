@@ -109,7 +109,7 @@ Apps Script zawsze zwraca HTTP 200, więc wynik niesie pole `ok` i kod `error`.
 
 | Sytuacja | Odpowiedź |
 | --- | --- |
-| Zapisano | `{"ok":true,"id":17,"nickname":"<ksywa z listy>","ticketType":"<typ z listy>","registeredAt":"2026-12-05T09:42:05+01:00"}` |
+| Zapisano | `{"ok":true,"id":17,"nickname":"<ksywa z listy>","ticketType":"<typ z listy>","registeredAt":"2026-12-05T08:42:05.000Z"}` |
 | Zapisano, numeru nie ma na liście biletów | `{"ok":true,"id":18,"nickname":null,"ticketType":null,"registeredAt":"…"}` |
 | Numer i „Imię I.” już zarejestrowane | `{"ok":false,"error":"DUPLICATE"}` |
 | Błędne dane | `{"ok":false,"error":"VALIDATION","field":"orderNumber"}` |
