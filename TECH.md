@@ -38,6 +38,7 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── triggers.js                installTriggers, onStatusEdit: data wyjścia po zmianie „Status”
 │   ├── triggers.test.js
 │   └── diagnoza.js                sprawdzenie konfiguracji z edytora Apps Script
+├── scripts/api-test.mjs           testy M3.T działającego API: npm run test:api -- <adres /exec>
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    stan ekranu i przejścia
@@ -95,6 +96,8 @@ const data = (await res.json()) as RegisterResponse;
 ```
 
 Ciało typu string wysyła się domyślnie jako `text/plain;charset=UTF-8`. Takie żądanie nie wywołuje zapytania wstępnego CORS (OPTIONS), którego Apps Script nie obsługuje. Apps Script odpowiada przekierowaniem na `script.googleusercontent.com`, a `fetch` wykonuje je domyślnie i odczytuje JSON.
+
+Limit czasu: `api.ts` czeka na odpowiedź do 30 s (`AbortController`). Krótszy limit jest ryzykowny: w teście T7 odpowiedzi trwały do 15 s, a przerwane żądanie mogło już zapisać wiersz, więc ponowienie dałoby `DUPLICATE`.
 
 Ponawianie: przy `BUSY` albo błędzie sieci `api.ts` ponawia żądanie automatycznie do 2 razy, po 1 s i po 2 s. Gdy nadal się nie uda, strona pokazuje komunikat i przycisk „Spróbuj ponownie”. `DUPLICATE` i `VALIDATION` nie są ponawiane.
 

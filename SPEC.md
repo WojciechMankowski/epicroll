@@ -144,7 +144,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | N2 | React + TypeScript i Tailwind (TECH.md), bez ciasteczek i analityki. |
 | N3 | Każde pole ma etykietę `<label>`; numer ID na ekranie końcowym ma co najmniej 72 px. |
 | N4 | Interfejs po polsku. |
-| N5 | Cel: odpowiedź API poniżej 3 s przy 25 równoległych rejestracjach (limit Apps Script to 30 równoczesnych wykonań) (do zmierzenia w teście). |
+| N5 | Pojedyncza rejestracja trwa około 3 s. Przy 25 równoległych rejestracjach wszystkie się zapisują; pomiar T7 z 22.10.2026: mediana 6,1 s, najdłużej 15,2 s, całość 22 s. Strona czeka na odpowiedź do 30 s i przez ten czas pokazuje „Rejestruję…”. Limit Apps Script to 30 równoczesnych wykonań. |
 | N6 | Pod formularzem krótka informacja o przetwarzaniu danych: kto zbiera, w jakim celu, kiedy usunie. Treść zatwierdza organizator jako administrator danych. |
 
 | Ryzyko | Skutek | Środek zaradczy |
@@ -155,7 +155,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | Uczestnik wyczyści przeglądarkę lub zmieni telefon | traci ekran z ID, ponowna próba daje `DUPLICATE` | obsługa szuka po kolumnie „Nr Zamówienia” |
 | Publiczny adres API | spam w arkuszu | pułapka `website`, limity długości, reguły znaków; filtr w arkuszu przy sprzątaniu |
 | Pierwsze wywołanie Apps Script po przerwie trwa dłużej | uczestnik klika ponownie | blokada przycisku (F3), tekst „Rejestruję…” |
-| Szczyt rejestracji przy wejściu | kolejka na blokadzie, odpowiedzi `BUSY`, przekroczenie limitu 30 równoczesnych wykonań | automatyczne ponowienie (2 próby), test obciążeniowy (T7), przycisk „Spróbuj ponownie” |
+| Szczyt rejestracji przy wejściu | kolejka na blokadzie (przy 25 osobach naraz ostatnia czeka do 15 s), odpowiedzi `BUSY`, przekroczenie limitu 30 równoczesnych wykonań | limit oczekiwania strony 30 s, automatyczne ponowienie (2 próby), przycisk „Spróbuj ponownie”; przyspieszenie API po pokazie |
 
 ## Poza zakresem
 
@@ -166,6 +166,8 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 - Tryb kiosku na wspólnym urządzeniu.
 - Logowanie uczestników i obsługi.
 - Wyjścia tymczasowe (wyjście i powrót tego samego dnia). Są potrzebne, ale na razie obsługa prowadzi je poza aplikacją.
+- Karta z odrzuconymi zgłoszeniami (duplikaty, błędne numery) w arkuszu obsługi. Potrzebna w kolejnej wersji.
+- Przyspieszenie API (na przykład pamięć podręczna listy biletów).
 
 ## Otwarte pytania
 
