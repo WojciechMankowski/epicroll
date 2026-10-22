@@ -44,11 +44,12 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── App.tsx                    widok ekranów (formularz, wysyłanie, ekran z ID, błąd)
 │   ├── useRegistration.ts         stany ekranu i przejścia, komunikaty błędów
 │   ├── api.ts                     wywołanie API, typy żądania i odpowiedzi, ponawianie
+│   ├── format.ts                  godzina rejestracji w czasie polskim (Intl, Europe/Warsaw)
 │   ├── storage.ts                 odczyt i zapis localStorage w try/catch
 │   ├── validation.ts              reguły pól (te same co w apps-script/validation.js)
 │   ├── components/
 │   │   ├── RegistrationForm.tsx
-│   │   └── IdScreen.tsx
+│   │   └── IdScreen.tsx           ekran z ID: numer w obrysie kostki k20 (SVG), osoba, godzina rejestracji
 │   └── index.css                  @import "tailwindcss";
 ├── test-data/validation-cases.json  przypadki testowe walidacji, wspólne dla API i strony
 ├── .env.production                VITE_API_URL=<adres /exec aplikacji Apps Script>

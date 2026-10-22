@@ -1,3 +1,4 @@
+import { IdScreen } from './components/IdScreen'
 import { RegistrationForm } from './components/RegistrationForm'
 import { EVENT_DATE, EVENT_NAME, EVENT_PLACE } from './event'
 import { ERROR_MESSAGES, useRegistration, type RegistrationDeps } from './useRegistration'
@@ -20,17 +21,7 @@ export default function App({ deps }: Props) {
         </p>
       </header>
 
-      {state.screen === 'done' && (
-        <section aria-label="Twoja rejestracja" className="flex flex-col gap-2">
-          <p className="text-7xl font-bold" data-testid="registration-id">{state.registration.id}</p>
-          <p>{state.registration.firstName} {state.registration.lastInitial}.</p>
-          {state.registration.nickname && <p>Ksywa: {state.registration.nickname}</p>}
-          <p>Numer zamówienia: {state.registration.orderNumber}</p>
-          {state.registration.ticketType && <p>Typ biletu: {state.registration.ticketType}</p>}
-          <p className="font-semibold">Pokaż ten ekran obsłudze.</p>
-          {!state.saved && <p>Zrób zrzut ekranu: przeglądarka nie zapamięta tej rejestracji.</p>}
-        </section>
-      )}
+      {state.screen === 'done' && <IdScreen registration={state.registration} saved={state.saved} />}
 
       {state.screen === 'error' && (
         <section aria-label="Błąd rejestracji" className="flex flex-col gap-3">

@@ -7,7 +7,7 @@ Claude nie robi commitów ani pushy. Zmiany zostawia jako niezacommitowane w fol
 ## Sposób pracy
 
 1. Każdy kamień milowy ma osobną gałąź od `main`: `m3-api`, `m4-logika-strony`, `m5-interfejs`, `m6-integracja`.
-2. Jedno zadanie (issue) naraz: Claude zapisuje zmiany w folderze, Wojtek sprawdza je lokalnie i robi commit na gałęzi kamienia. Dopiero potem następne zadanie.
+2. Jedno zadanie (issue) naraz. Przed rozpoczęciem zadania Claude opisuje plan i czeka na akceptację Wojtka. Potem Claude zapisuje zmiany w folderze, Wojtek sprawdza je lokalnie i robi commit na gałęzi kamienia. Dopiero potem następne zadanie.
 3. Po ostatnim zadaniu kamienia: testy z issue `Mx.T`.
 4. Gdy testy przechodzą: PR z gałęzi kamienia do `main`. Claude przygotowuje opis PR (zamknięte issues, wyniki testów).
 
