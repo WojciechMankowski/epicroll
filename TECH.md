@@ -106,7 +106,7 @@ Klucz `rejestracja-<slug-wydarzenia>-v1`, wartość to JSON z polami `id`, `orde
 
 | Pole | Wyrażenie |
 | --- | --- |
-| Numer zamówienia (po usunięciu spacji) | `^\d{4,12}$` |
+| Numer zamówienia (po usunięciu spacji) | `^\d{7}$` |
 | Imię | `^[\p{L}][\p{L} -]{1,29}$` (flaga `u`) |
 | Inicjał nazwiska | `^\p{L}$` (flaga `u`) |
 

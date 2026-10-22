@@ -64,7 +64,7 @@ Karta „Rejestracje”:
 | A | Lp | liczba całkowita, to jest ID pokazywane uczestnikowi | skrypt | 17 |
 | B | Imię i Nazwisko Podane w formularz | tekst „Imię I.” złożony z dwóch pól formularza | skrypt | Anna K. |
 | C | Ksywa | wartość z arkusza z listą biletów, pusta, gdy osoby nie ma na liście | skrypt | (wartość z listy biletów) |
-| D | Nr Zamówienia | same cyfry, format „Zwykły tekst” | skrypt | 3012456 |
+| D | Nr Zamówienia | 7 cyfr, format „Zwykły tekst” | skrypt | 3012456 |
 | E | Typ Biletu | wartość z arkusza z listą biletów albo „brak na liście” | skrypt | (wartość z listy biletów) |
 | F | Działanie | wolny tekst | obsługa | (uwagi obsługi) |
 | G | Status | lista rozwijana: Na terenie, Wyszedł na stałe | skrypt przy rejestracji („Na terenie”), potem obsługa | Na terenie |
@@ -80,7 +80,7 @@ Arkusz z listą biletów (osobny plik, pierwsza karta, jedna osoba w wierszu). S
 | D | Nr Zamówienia | dopasowania numeru |
 | E | Typ Biletu | przepisania do arkusza obsługi |
 
-Pierwszy wiersz zamrożony w obu arkuszach. Skrypt tylko czyta arkusz z listą biletów. „Data przyjścia” to ten sam moment co `registeredAt` w odpowiedzi API. Ochrona zakresów A:E i H:I na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
+Pierwszy wiersz zamrożony w obu arkuszach. Skrypt tylko czyta arkusz z listą biletów i robi to przy każdej rejestracji. Organizator poprawia listę dzień przed wydarzeniem (dopisuje i usuwa osoby); zmiany działają od razu, bez importu. „Data przyjścia” to ten sam moment co `registeredAt` w odpowiedzi API. Ochrona zakresów A:E i H:I na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
 
 ## Kontrakt API
 
@@ -120,7 +120,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 | Pole | Reguła | Komunikat przy błędzie |
 | --- | --- | --- |
-| Numer zamówienia | same cyfry, 4–12 znaków (przykład 3012456); spacje usuwane przed sprawdzeniem; pole z `inputmode="numeric"` (klawiatura numeryczna na telefonie) | „Sprawdź numer zamówienia: same cyfry, np. 3012456.” |
+| Numer zamówienia | dokładnie 7 cyfr (przykład 3078012); spacje usuwane przed sprawdzeniem; pole z `inputmode="numeric"` (klawiatura numeryczna na telefonie) | „Sprawdź numer zamówienia: 7 cyfr, np. 3078012.” |
 | Imię | 2–30 znaków, litery (także polskie), spacja, „-”; zaczyna się od litery | „Wpisz imię (same litery).” |
 | Inicjał nazwiska | dokładnie jedna litera, zapisywana wielką | „Wpisz pierwszą literę nazwiska.” |
 | Każde pole | wymagane | „Uzupełnij to pole.” |
@@ -167,8 +167,6 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 ## Otwarte pytania
 
-- [ ] Czy numer zamówienia ma stałą liczbę cyfr? Teraz reguła przyjmuje 4–12 cyfr.
-- [ ] Kto i jak często aktualizuje arkusz z listą biletów?
 - [ ] Czy numer spoza listy biletów ma blokować rejestrację? Teraz rejestracja przechodzi z wpisem „brak na liście”.
 - [ ] Nazwa, data i miejsce wydarzenia (tekst na stronie i slug w kluczu localStorage).
 - [ ] Ile osób się spodziewacie i w jakim oknie czasowym rejestrują się najczęściej?
