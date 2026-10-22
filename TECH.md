@@ -99,7 +99,7 @@ Ciało typu string wysyła się domyślnie jako `text/plain;charset=UTF-8`. Taki
 
 Limit czasu: `api.ts` czeka na odpowiedź do 30 s (`AbortController`). Krótszy limit jest ryzykowny: w teście T7 odpowiedzi trwały do 15 s, a przerwane żądanie mogło już zapisać wiersz, więc ponowienie dałoby `DUPLICATE`.
 
-Ponawianie: przy `BUSY` albo błędzie sieci `api.ts` ponawia żądanie automatycznie do 2 razy, po 1 s i po 2 s. Gdy nadal się nie uda, strona pokazuje komunikat i przycisk „Spróbuj ponownie”. `DUPLICATE` i `VALIDATION` nie są ponawiane.
+Ponawianie: przy `BUSY` albo błędzie sieci `registerAttendee` w `api.ts` ponawia żądanie automatycznie do 2 razy, po 1 s i po 2 s. Przekroczenia limitu czasu nie ponawia i zwraca `SERVER`. Odpowiedź, która nie jest JSON-em albo nie ma kształtu z kontraktu (`parseResponse`), też daje `SERVER`. Gdy nadal się nie uda, strona pokazuje komunikat i przycisk „Spróbuj ponownie”. `DUPLICATE` i `VALIDATION` nie są ponawiane.
 
 ### Stany ekranu w `App.tsx`
 
