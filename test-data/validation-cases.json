@@ -1,0 +1,82 @@
+[
+  {
+    "name": "poprawne dane, inicjał zamieniany na wielką literę",
+    "input": { "orderNumber": "3078012", "firstName": "Anna", "lastInitial": "k", "website": "" },
+    "expected": { "ok": true, "value": { "orderNumber": "3078012", "firstName": "Anna", "lastInitial": "K" } }
+  },
+  {
+    "name": "numer ze spacjami jest przyjęty po ich usunięciu",
+    "input": { "orderNumber": " 3078 012 ", "firstName": "Anna", "lastInitial": "K", "website": "" },
+    "expected": { "ok": true, "value": { "orderNumber": "3078012", "firstName": "Anna", "lastInitial": "K" } }
+  },
+  {
+    "name": "numer podany jako liczba",
+    "input": { "orderNumber": 3078012, "firstName": "Anna", "lastInitial": "K", "website": "" },
+    "expected": { "ok": true, "value": { "orderNumber": "3078012", "firstName": "Anna", "lastInitial": "K" } }
+  },
+  {
+    "name": "numer z literą",
+    "input": { "orderNumber": "307801a", "firstName": "Anna", "lastInitial": "K", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "orderNumber" }
+  },
+  {
+    "name": "numer z 6 cyframi",
+    "input": { "orderNumber": "307801", "firstName": "Anna", "lastInitial": "K", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "orderNumber" }
+  },
+  {
+    "name": "numer z 8 cyframi",
+    "input": { "orderNumber": "30780123", "firstName": "Anna", "lastInitial": "K", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "orderNumber" }
+  },
+  {
+    "name": "brak numeru",
+    "input": { "firstName": "Anna", "lastInitial": "K", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "orderNumber" }
+  },
+  {
+    "name": "imię zaczynające się od =",
+    "input": { "orderNumber": "3078012", "firstName": "=SUMA(1;1)", "lastInitial": "K", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "firstName" }
+  },
+  {
+    "name": "imię z jednej litery",
+    "input": { "orderNumber": "3078012", "firstName": "A", "lastInitial": "K", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "firstName" }
+  },
+  {
+    "name": "imię dłuższe niż 30 znaków",
+    "input": { "orderNumber": "3078012", "firstName": "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "lastInitial": "K", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "firstName" }
+  },
+  {
+    "name": "imię z cyfrą",
+    "input": { "orderNumber": "3078012", "firstName": "Anna2", "lastInitial": "K", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "firstName" }
+  },
+  {
+    "name": "imię z polskimi znakami, spacją i myślnikiem, nadmiar spacji usuwany",
+    "input": { "orderNumber": "3078012", "firstName": "  Łucja   Anna-Maria ", "lastInitial": "ż", "website": "" },
+    "expected": { "ok": true, "value": { "orderNumber": "3078012", "firstName": "Łucja Anna-Maria", "lastInitial": "Ż" } }
+  },
+  {
+    "name": "inicjał z dwóch liter",
+    "input": { "orderNumber": "3078012", "firstName": "Anna", "lastInitial": "Ko", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "lastInitial" }
+  },
+  {
+    "name": "pusty inicjał",
+    "input": { "orderNumber": "3078012", "firstName": "Anna", "lastInitial": " ", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "lastInitial" }
+  },
+  {
+    "name": "inicjał będący cyfrą",
+    "input": { "orderNumber": "3078012", "firstName": "Anna", "lastInitial": "1", "website": "" },
+    "expected": { "ok": false, "error": "VALIDATION", "field": "lastInitial" }
+  },
+  {
+    "name": "wypełnione pole-pułapka website",
+    "input": { "orderNumber": "3078012", "firstName": "Anna", "lastInitial": "K", "website": "http://spam.example" },
+    "expected": { "ok": false, "error": "VALIDATION" }
+  }
+]

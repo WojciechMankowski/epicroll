@@ -25,17 +25,31 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 ├── apps-script/
 │   ├── .clasp.json                scriptId projektu Apps Script
 │   ├── appsscript.json            manifest: strefa czasowa, V8, ustawienia aplikacji internetowej
-│   └── Code.js                    doPost i funkcje pomocnicze
+│   ├── Code.js                    doPost, handleRequest (walidacja → registerPerson, błędy → SERVER), productionEnv
+│   ├── Code.test.js               testy całego API na atrapach usług Google
+│   ├── validation.js              walidacja żądania (funkcje bez efektów ubocznych)
+│   ├── validation.test.js         testy Vitest, ładują validation.js w Node
+│   ├── registrations.js           odczyt karty „Rejestracje”, wykrywanie duplikatów
+│   ├── registrations.test.js
+│   ├── tickets.js                 wyszukiwanie ksywy i typu biletu w liście biletów
+│   ├── tickets.test.js
+│   ├── register.js                nadanie Lp i zapis wiersza pod blokadą (registerPerson)
+│   ├── register.test.js
+│   ├── triggers.js                installTriggers, onStatusEdit: data wyjścia po zmianie „Status”
+│   ├── triggers.test.js
+│   └── diagnoza.js                sprawdzenie konfiguracji z edytora Apps Script
+├── scripts/api-test.mjs           testy M3.T działającego API: npm run test:api -- <adres /exec>
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    stan ekranu i przejścia
 │   ├── api.ts                     wywołanie API, typy żądania i odpowiedzi, ponawianie
 │   ├── storage.ts                 odczyt i zapis localStorage w try/catch
-│   ├── validation.ts              reguły pól (te same co w Code.js)
+│   ├── validation.ts              reguły pól (te same co w apps-script/validation.js)
 │   ├── components/
 │   │   ├── RegistrationForm.tsx
 │   │   └── IdScreen.tsx
 │   └── index.css                  @import "tailwindcss";
+├── test-data/validation-cases.json  przypadki testowe walidacji, wspólne dla API i strony
 ├── .env.production                VITE_API_URL=<adres /exec aplikacji Apps Script>
 ├── index.html
 ├── vite.config.ts                 base: '/<repo>/', wtyczki react i tailwindcss
@@ -59,7 +73,7 @@ export type RegisterSuccess = {
   id: number;
   nickname: string | null;
   ticketType: string | null;
-  registeredAt: string; // ISO 8601
+  registeredAt: string; // ISO 8601 w UTC, np. 2026-12-05T08:42:05.000Z; strona pokazuje czas polski
 };
 
 export type RegisterError = {
@@ -83,6 +97,8 @@ const data = (await res.json()) as RegisterResponse;
 
 Ciało typu string wysyła się domyślnie jako `text/plain;charset=UTF-8`. Takie żądanie nie wywołuje zapytania wstępnego CORS (OPTIONS), którego Apps Script nie obsługuje. Apps Script odpowiada przekierowaniem na `script.googleusercontent.com`, a `fetch` wykonuje je domyślnie i odczytuje JSON.
 
+Limit czasu: `api.ts` czeka na odpowiedź do 30 s (`AbortController`). Krótszy limit jest ryzykowny: w teście T7 odpowiedzi trwały do 15 s, a przerwane żądanie mogło już zapisać wiersz, więc ponowienie dałoby `DUPLICATE`.
+
 Ponawianie: przy `BUSY` albo błędzie sieci `api.ts` ponawia żądanie automatycznie do 2 razy, po 1 s i po 2 s. Gdy nadal się nie uda, strona pokazuje komunikat i przycisk „Spróbuj ponownie”. `DUPLICATE` i `VALIDATION` nie są ponawiane.
 
 ### Stany ekranu w `App.tsx`
@@ -102,7 +118,7 @@ Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`
 
 ### Walidacja
 
-`validation.ts` i `Code.js` mają te same wyrażenia regularne. Przy zmianie reguły trzeba poprawić oba pliki.
+`src/validation.ts` i `apps-script/validation.js` mają te same wyrażenia regularne i przechodzą te same przypadki z `test-data/validation-cases.json`. Przy zmianie reguły trzeba poprawić oba pliki i przypadki testowe.
 
 | Pole | Wyrażenie |
 | --- | --- |
@@ -142,11 +158,13 @@ Identyfikatory obu arkuszy leżą we Właściwościach skryptu i nie trafiają d
 2. Usuń spacje z numeru zamówienia.
 3. Załóż blokadę `LockService.getScriptLock().tryLock(10000)`. Brak blokady → `BUSY`.
 4. Odczytaj kolumny A, B i D karty „Rejestracje” jednym `getValues()`.
-5. Jest wiersz z tym samym numerem w D (porównanie jako tekst, `String(v).trim()`) i tym samym „Imię I.” w B (bez rozróżniania wielkości liter) → zwolnij blokadę, zwróć `DUPLICATE`.
+5. Jest wiersz z tym samym numerem w D (porównanie jako tekst, `String(v).trim()`) i tą samą osobą w B → zwolnij blokadę, zwróć `DUPLICATE`. Osobę porównuje `personKey`: imiona i pierwsza litera ostatniego wyrazu, bez wielkości liter i nadmiarowych spacji. „Anna K.” i dopisana ręcznie „Anna Kowalska” to ta sama osoba (`apps-script/registrations.js`).
 6. Odczytaj pierwszą kartę arkusza `TICKETS_SHEET_ID` jednym `getDataRange().getValues()`. Z wiersza 1 ustal numery kolumn po nagłówkach (funkcja `findColumns`: nagłówek zaczynający się od „Imię i Nazwisko”, „Ksywa”, „Nr Zamówienia”, „Typ Biletu”; porównanie po `trim()` i bez wielkości liter). Znajdź wiersz z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od inicjału (porównanie po `trim()`, bez wielkości liter, z polskimi znakami). Weź z niego ksywę i typ biletu. Brak nagłówka → `SERVER` i `console.error` z jego nazwą. Odczyt listy może być przed założeniem blokady, bo skrypt jej nie zmienia. Brak → pusta ksywa i „brak na liście”.
-7. Nowe ID = największa wartość w kolumnie A + 1 (działa także po ręcznym usunięciu wiersza).
+7. Nowe ID = największa liczba w kolumnie A + 1, puste i nieliczbowe komórki pomijane (działa także po ręcznym usunięciu wiersza).
 8. `appendRow([id, "Anna K.", ksywa, numer, typBiletu, "", "Na terenie", teraz, ""])`, gdzie `teraz = new Date()`, potem `SpreadsheetApp.flush()`.
 9. Zwolnij blokadę (`finally`), zwróć `ok: true` z ID, ksywą, typem biletu i `registeredAt` równym `teraz`.
+
+Kroki 3–9 wykonuje `registerPerson(person, env)` w `apps-script/register.js`. Dostaje blokadę, kartę, odczyt listy biletów, zegar i `flush` przez `env`, więc testy podają atrapy zamiast usług Google.
 
 Każda odpowiedź przechodzi przez jedną funkcję pomocniczą:
 
@@ -158,29 +176,16 @@ function json(obj) {
 }
 ```
 
-Nieprzewidziany wyjątek łapie `try/catch` wokół całego `doPost`, zapisuje go przez `console.error` (widać go w zakładce „Wykonania”) i zwraca `SERVER`.
+Nieprzewidziany wyjątek (także brak `SHEET_ID`, `TICKETS_SHEET_ID` albo karty „Rejestracje”) łapie `try/catch` w `handleRequest`, zapisuje go przez `console.error` (widać go w zakładce „Wykonania”) i zwraca `SERVER`.
 
 ### Data wyjścia: wyzwalacz przy edycji
 
-Skrypt jest samodzielny (nie jest przypięty do arkusza), więc prosty wyzwalacz `onEdit` nie zadziała. Funkcja `installTriggers()`, uruchomiona raz z edytora, tworzy wyzwalacz instalowany dla arkusza:
+Skrypt jest samodzielny (nie jest przypięty do arkusza), więc prosty wyzwalacz `onEdit` nie zadziała. Kod jest w `apps-script/triggers.js`:
 
-```js
-function installTriggers() {
-  const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-  ScriptApp.newTrigger('onStatusEdit').forSpreadsheet(id).onEdit().create();
-}
+- `installTriggers()`, uruchomiona raz z edytora, usuwa wcześniejsze wyzwalacze `onStatusEdit` i tworzy jeden wyzwalacz instalowany przy edycji arkusza `SHEET_ID`.
+- `onStatusEdit(e)` reaguje tylko na pojedynczą komórkę kolumny G karty „Rejestracje” poniżej nagłówka: „Wyszedł na stałe” wpisuje bieżącą datę do I, „Na terenie” czyści I, inne wartości nic nie zmieniają.
 
-function onStatusEdit(e) {
-  const range = e.range;
-  if (range.getSheet().getName() !== 'Rejestracje') return;
-  if (range.getColumn() !== 7 || range.getRow() < 2 || range.getNumRows() !== 1) return;
-  const exit = range.offset(0, 2); // kolumna I
-  if (e.value === 'Wyszedł na stałe') exit.setValue(new Date());
-  else if (e.value === 'Na terenie') exit.clearContent();
-}
-```
-
-Wyzwalacz instalowany działa z uprawnieniami osoby, która go utworzyła, więc zapisze kolumnę I mimo ochrony H:I. Po zmianie `SHEET_ID` na inny arkusz trzeba usunąć stary wyzwalacz i uruchomić `installTriggers()` ponownie. Wklejenie wartości do wielu komórek G naraz nie wypełnia dat (warunek `getNumRows() !== 1`); obsługa zmienia status pojedynczo.
+Wyzwalacz instalowany działa z uprawnieniami osoby, która go utworzyła, więc zapisze kolumnę I mimo ochrony H:I. Uruchamia się tylko przy edycji przez człowieka; zapis wiersza przez `doPost` go nie wywołuje. Po zmianie `SHEET_ID` na inny arkusz trzeba ponownie uruchomić `installTriggers()`. Wklejenie wartości do wielu komórek G naraz nie wypełnia dat; obsługa zmienia status pojedynczo. Funkcja `diagnoza` pokazuje listę ustawionych wyzwalaczy.
 
 ### Ograniczenia Apps Script
 
@@ -197,7 +202,7 @@ Wyzwalacz instalowany działa z uprawnieniami osoby, która go utworzyła, więc
 1. Włącz „Google Apps Script API” w ustawieniach użytkownika Apps Script (script.google.com, Ustawienia).
 2. `npm install -g @google/clasp`, potem `clasp login`.
 3. W katalogu `apps-script/`: `clasp create --type standalone --title "Rejestracja API"` (albo `clasp clone <scriptId>` dla istniejącego projektu).
-4. `clasp push` wysyła `Code.js` i `appsscript.json`.
+4. `clasp push` wysyła pliki `.js` i `appsscript.json` (testy pomija `.claspignore`).
 5. Pierwsze wdrożenie w edytorze: Wdróż → Nowe wdrożenie → „Aplikacja internetowa”. Zapisz identyfikator wdrożenia i adres `/exec` w `.env.production`.
 6. Kolejne zmiany: `clasp push`, potem `clasp deploy -i <deploymentId>`. Aktualizacja istniejącego wdrożenia zachowuje adres URL, więc strona nie wymaga zmian.
 

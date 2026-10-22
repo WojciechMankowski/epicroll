@@ -42,7 +42,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 | F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. Nagłówek strony i ekranu z ID to „EPIC ROLL”, pod nim „5 grudnia 2026 · Szkoły Okrętowe i Techniczne Conradinum, Gdańsk”. | Wymaganie |
 | F2 | Strona sprawdza dane przed wysłaniem (reguły w sekcji „Walidacja i komunikaty”). Serwer sprawdza je ponownie. | Założenie |
 | F3 | Przycisk „Zarejestruj” blokuje się na czas wysyłania, żeby jedno kliknięcie dawało jeden wiersz. | Założenie |
-| F4 | Jedno zamówienie może obejmować kilka osób o różnych imionach i nazwiskach. Duplikat to wiersz z tym samym numerem zamówienia i tym samym „Imię I.” (bez rozróżniania wielkości liter). Serwer przed porównaniem usuwa spacje z numeru. | Wymaganie |
+| F4 | Jedno zamówienie może obejmować kilka osób o różnych imionach i nazwiskach. Duplikat to wiersz z tym samym numerem zamówienia i tą samą osobą: to samo imię i ta sama pierwsza litera nazwiska, bez rozróżniania wielkości liter. „Anna K.” i dopisana ręcznie „Anna Kowalska” to ta sama osoba. Serwer przed porównaniem usuwa spacje z numeru. | Wymaganie |
 | F5 | Gdy para numer + „Imię I.” już jest w arkuszu, serwer odrzuca zgłoszenie, a strona pokazuje komunikat z prośbą o kontakt z obsługą. Nowy wiersz nie powstaje. | Wymaganie |
 | F6 | Gdy takiej pary nie ma, serwer nadaje kolejny numer ID (kolumna „Lp”: 1, 2, 3…), dopisuje wiersz i zwraca ID. | Wymaganie |
 | F7 | Serwer szuka w osobnym arkuszu z listą biletów wiersza z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od podanego inicjału. Z tego wiersza wpisuje ksywę do kolumny „Ksywa”, a typ do kolumny „Typ Biletu”. Gdy takiego wiersza nie ma, „Ksywa” zostaje pusta, „Typ Biletu” dostaje „brak na liście”, a rejestracja przechodzi. | Wymaganie (zachowanie przy braku: założenie) |
@@ -109,7 +109,7 @@ Apps Script zawsze zwraca HTTP 200, więc wynik niesie pole `ok` i kod `error`.
 
 | Sytuacja | Odpowiedź |
 | --- | --- |
-| Zapisano | `{"ok":true,"id":17,"nickname":"<ksywa z listy>","ticketType":"<typ z listy>","registeredAt":"2026-12-05T09:42:05+01:00"}` |
+| Zapisano | `{"ok":true,"id":17,"nickname":"<ksywa z listy>","ticketType":"<typ z listy>","registeredAt":"2026-12-05T08:42:05.000Z"}` |
 | Zapisano, numeru nie ma na liście biletów | `{"ok":true,"id":18,"nickname":null,"ticketType":null,"registeredAt":"…"}` |
 | Numer i „Imię I.” już zarejestrowane | `{"ok":false,"error":"DUPLICATE"}` |
 | Błędne dane | `{"ok":false,"error":"VALIDATION","field":"orderNumber"}` |
@@ -144,7 +144,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | N2 | React + TypeScript i Tailwind (TECH.md), bez ciasteczek i analityki. |
 | N3 | Każde pole ma etykietę `<label>`; numer ID na ekranie końcowym ma co najmniej 72 px. |
 | N4 | Interfejs po polsku. |
-| N5 | Cel: odpowiedź API poniżej 3 s przy 25 równoległych rejestracjach (limit Apps Script to 30 równoczesnych wykonań) (do zmierzenia w teście). |
+| N5 | Pojedyncza rejestracja trwa około 3 s. Przy 25 równoległych rejestracjach wszystkie się zapisują; pomiar T7 z 22.10.2026: mediana 6,1 s, najdłużej 15,2 s, całość 22 s. Strona czeka na odpowiedź do 30 s i przez ten czas pokazuje „Rejestruję…”. Limit Apps Script to 30 równoczesnych wykonań. |
 | N6 | Pod formularzem krótka informacja o przetwarzaniu danych: kto zbiera, w jakim celu, kiedy usunie. Treść zatwierdza organizator jako administrator danych. |
 
 | Ryzyko | Skutek | Środek zaradczy |
@@ -155,7 +155,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | Uczestnik wyczyści przeglądarkę lub zmieni telefon | traci ekran z ID, ponowna próba daje `DUPLICATE` | obsługa szuka po kolumnie „Nr Zamówienia” |
 | Publiczny adres API | spam w arkuszu | pułapka `website`, limity długości, reguły znaków; filtr w arkuszu przy sprzątaniu |
 | Pierwsze wywołanie Apps Script po przerwie trwa dłużej | uczestnik klika ponownie | blokada przycisku (F3), tekst „Rejestruję…” |
-| Szczyt rejestracji przy wejściu | kolejka na blokadzie, odpowiedzi `BUSY`, przekroczenie limitu 30 równoczesnych wykonań | automatyczne ponowienie (2 próby), test obciążeniowy (T7), przycisk „Spróbuj ponownie” |
+| Szczyt rejestracji przy wejściu | kolejka na blokadzie (przy 25 osobach naraz ostatnia czeka do 15 s), odpowiedzi `BUSY`, przekroczenie limitu 30 równoczesnych wykonań | limit oczekiwania strony 30 s, automatyczne ponowienie (2 próby), przycisk „Spróbuj ponownie”; przyspieszenie API po pokazie |
 
 ## Poza zakresem
 
@@ -166,6 +166,8 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 - Tryb kiosku na wspólnym urządzeniu.
 - Logowanie uczestników i obsługi.
 - Wyjścia tymczasowe (wyjście i powrót tego samego dnia). Są potrzebne, ale na razie obsługa prowadzi je poza aplikacją.
+- Karta z odrzuconymi zgłoszeniami (duplikaty, błędne numery) w arkuszu obsługi. Potrzebna w kolejnej wersji.
+- Przyspieszenie API (na przykład pamięć podręczna listy biletów).
 
 ## Otwarte pytania
 
