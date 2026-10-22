@@ -18,7 +18,7 @@ M3 i M4 są od siebie niezależne i mogą iść równolegle, bo strona testuje l
 
 ## M1. Arkusz i dane testowe
 
-1. Zebrać od organizatora odpowiedzi na otwarte pytania: czy numer ma stałą liczbę cyfr, gdzie są lista biletów i ksywy (pliki, kolumny), czy trzeba rejestrować wyjścia tymczasowe. Na pokaz wystarczą założenia ze SPEC.md.
+1. Zebrać od organizatora odpowiedzi na otwarte pytania: czy numer ma stałą liczbę cyfr, gdzie są lista biletów i ksywy (pliki, kolumny). Na pokaz wystarczą założenia ze SPEC.md.
 2. Utworzyć arkusz testowy z kartą „Rejestracje”: kolumny A–I według SPEC.md, kolumna D w formacie tekstu, lista rozwijana w G (Na terenie, Wyszedł na stałe), format `yyyy-mm-dd hh:mm` w H i I, zamrożony wiersz 1.
 3. Dodać kartę „Bilety” z kolumnami Nr Zamówienia, Imię i nazwisko, Typ Biletu, Ksywa i wpisać 10 wierszy testowych, w tym jedno zamówienie z dwiema osobami i jeden wiersz bez ksywy.
 4. Włączyć ochronę zakresów A:E i H:I na karcie „Rejestracje”.

@@ -163,13 +163,13 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 - Potwierdzenie e-mailem lub SMS.
 - Tryb kiosku na wspólnym urządzeniu.
 - Logowanie uczestników i obsługi.
+- Wyjścia tymczasowe (wyjście i powrót tego samego dnia). Są potrzebne, ale na razie obsługa prowadzi je poza aplikacją.
 
 ## Otwarte pytania
 
 - [ ] Czy numer zamówienia ma stałą liczbę cyfr? Teraz reguła przyjmuje 4–12 cyfr.
 - [ ] Gdzie leżą lista wszystkich biletów i ksywy z zapisów na sesje: w jednym pliku czy w dwóch, na których kartach, w których kolumnach są numer zamówienia, typ biletu i ksywa, kto i jak często je aktualizuje?
 - [ ] Czy numer spoza listy biletów ma blokować rejestrację? Teraz rejestracja przechodzi z wpisem „brak na liście”.
-- [ ] Czy trzeba rejestrować wyjścia tymczasowe (wyjście i powrót tego samego dnia)? Teraz „Status” ma tylko „Na terenie” i „Wyszedł na stałe”.
 - [ ] Nazwa, data i miejsce wydarzenia (tekst na stronie i slug w kluczu localStorage).
 - [ ] Ile osób się spodziewacie i w jakim oknie czasowym rejestrują się najczęściej?
 - [ ] Czy ID (Lp) ma zaczynać się od 1, czy od innej liczby (np. 100, żeby każde ID miało trzy cyfry)?
