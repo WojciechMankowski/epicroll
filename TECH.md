@@ -118,7 +118,7 @@ Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`
 
 ### Walidacja
 
-`src/validation.ts` i `apps-script/validation.js` mają te same wyrażenia regularne i przechodzą te same przypadki z `test-data/validation-cases.json`. Przy zmianie reguły trzeba poprawić oba pliki i przypadki testowe.
+`src/validation.ts` i `apps-script/validation.js` mają te same wyrażenia regularne i przechodzą te same przypadki z `test-data/validation-cases.json`. Przy zmianie reguły trzeba poprawić oba pliki i przypadki testowe. Na stronie formularz sprawdza `validateForm`: zwraca znormalizowane wartości albo komunikat ze SPEC.md przy każdym błędnym polu naraz. `validateRegistration` w `src/validation.ts` podejmuje tę samą decyzję co API i służy do testu zgodności na wspólnych przypadkach.
 
 | Pole | Wyrażenie |
 | --- | --- |
