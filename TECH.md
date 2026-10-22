@@ -145,8 +145,8 @@ Identyfikator arkusza leży we Właściwościach skryptu pod kluczem `SHEET_ID` 
 5. Jest wiersz z tym samym numerem w D (porównanie jako tekst, `String(v).trim()`) i tym samym „Imię I.” w B (bez rozróżniania wielkości liter) → zwolnij blokadę, zwróć `DUPLICATE`.
 6. Odczytaj kartę „Bilety” i znajdź wiersz z tym numerem, w którym imię zgadza się z podanym, a nazwisko zaczyna się od inicjału (porównanie bez wielkości liter, z polskimi znakami). Weź z niego ksywę i typ biletu. Brak → pusta ksywa i „brak na liście”.
 7. Nowe ID = największa wartość w kolumnie A + 1 (działa także po ręcznym usunięciu wiersza).
-8. `appendRow([id, "Anna K.", ksywa, numer, typBiletu, "", ""])`, potem `SpreadsheetApp.flush()`.
-9. Zwolnij blokadę (`finally`), zwróć `ok: true` z ID, ksywą i typem biletu.
+8. `appendRow([id, "Anna K.", ksywa, numer, typBiletu, "", "Na terenie", teraz, ""])`, gdzie `teraz = new Date()`, potem `SpreadsheetApp.flush()`.
+9. Zwolnij blokadę (`finally`), zwróć `ok: true` z ID, ksywą, typem biletu i `registeredAt` równym `teraz`.
 
 Każda odpowiedź przechodzi przez jedną funkcję pomocniczą:
 
@@ -159,6 +159,28 @@ function json(obj) {
 ```
 
 Nieprzewidziany wyjątek łapie `try/catch` wokół całego `doPost`, zapisuje go przez `console.error` (widać go w zakładce „Wykonania”) i zwraca `SERVER`.
+
+### Data wyjścia: wyzwalacz przy edycji
+
+Skrypt jest samodzielny (nie jest przypięty do arkusza), więc prosty wyzwalacz `onEdit` nie zadziała. Funkcja `installTriggers()`, uruchomiona raz z edytora, tworzy wyzwalacz instalowany dla arkusza:
+
+```js
+function installTriggers() {
+  const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
+  ScriptApp.newTrigger('onStatusEdit').forSpreadsheet(id).onEdit().create();
+}
+
+function onStatusEdit(e) {
+  const range = e.range;
+  if (range.getSheet().getName() !== 'Rejestracje') return;
+  if (range.getColumn() !== 7 || range.getRow() < 2 || range.getNumRows() !== 1) return;
+  const exit = range.offset(0, 2); // kolumna I
+  if (e.value === 'Wyszedł na stałe') exit.setValue(new Date());
+  else if (e.value === 'Na terenie') exit.clearContent();
+}
+```
+
+Wyzwalacz instalowany działa z uprawnieniami osoby, która go utworzyła, więc zapisze kolumnę I mimo ochrony H:I. Po zmianie `SHEET_ID` na inny arkusz trzeba usunąć stary wyzwalacz i uruchomić `installTriggers()` ponownie. Wklejenie wartości do wielu komórek G naraz nie wypełnia dat (warunek `getNumRows() !== 1`); obsługa zmienia status pojedynczo.
 
 ### Ograniczenia Apps Script
 

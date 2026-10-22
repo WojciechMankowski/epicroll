@@ -29,6 +29,8 @@ flowchart TD
     G --> H[Zapis ID w localStorage]
     H --> I
     I -- pokazuje ID --> J
+    J -- wychodzi na stałe --> K[Obsługa: Status „Wyszedł na stałe”]
+    K --> L[Skrypt wpisuje Data wyjścia]
 ```
 
 Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. Przy każdym kolejnym wejściu na tym samym telefonie strona pokazuje ID od razu z localStorage, bez wywołania serwera.
@@ -47,11 +49,13 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 | F8 | Strona zapisuje w localStorage ID, numer zamówienia, imię, inicjał, ksywę, typ biletu i czas rejestracji. | Wymaganie |
 | F9 | Przy ponownym wejściu strona odczytuje localStorage i od razu pokazuje ekran z ID, bez formularza i bez wywołania serwera. | Wymaganie |
 | F10 | Ekran z ID pokazuje duży numer ID, „Imię I.”, ksywę, numer zamówienia, typ biletu i instrukcję „Pokaż ten ekran obsłudze”. Działa bez internetu. | Wymaganie |
-| F11 | Obsługa wpisuje uwagi w kolumnie „Działanie” (wolny tekst) i wypełnia kolumnę „Status”. Strona uczestnika nie czyta tych kolumn. | Wymaganie (wartości „Status”: do ustalenia) |
+| F11 | Obsługa wpisuje uwagi w kolumnie „Działanie” (wolny tekst). Strona uczestnika nie czyta kolumn F–I. | Wymaganie |
+| F12 | Przy rejestracji serwer wpisuje „Na terenie” w kolumnie „Status” i bieżącą datę z godziną w kolumnie „Data przyjścia”. | Wymaganie |
+| F13 | Gdy obsługa zmieni „Status” na „Wyszedł na stałe”, skrypt wpisuje bieżącą datę z godziną w kolumnie „Data wyjścia”. Powrót do „Na terenie” czyści „Data wyjścia”. | Wymaganie (czyszczenie: założenie) |
 
 ## Struktura arkusza Google
 
-Jeden plik, dwie karty. Karta „Rejestracje” ma układ podany przez organizatora: wiersz 1 to nagłówki, każdy kolejny wiersz to jedna rejestracja. Kolumny A–E wypełnia skrypt, kolumny F–G obsługa. Karta „Bilety” to lista wszystkich biletów, z której skrypt bierze ksywę i typ biletu.
+Jeden plik, dwie karty. Karta „Rejestracje” ma układ podany przez organizatora: wiersz 1 to nagłówki, każdy kolejny wiersz to jedna rejestracja. Przy rejestracji skrypt wypełnia kolumny A–E, G i H. Obsługa wpisuje „Działanie” (F) i zmienia „Status” (G); zmiana na „Wyszedł na stałe” wypełnia „Data wyjścia” (I). Karta „Bilety” to lista wszystkich biletów, z której skrypt bierze ksywę i typ biletu.
 
 Karta „Rejestracje”:
 
@@ -63,7 +67,9 @@ Karta „Rejestracje”:
 | D | Nr Zamówienia | same cyfry, format „Zwykły tekst” | skrypt | 3012456 |
 | E | Typ Biletu | wartość z karty „Bilety” albo „brak na liście” | skrypt | (wartość z listy biletów) |
 | F | Działanie | wolny tekst | obsługa | (uwagi obsługi) |
-| G | Status | do ustalenia | obsługa | (status weryfikacji) |
+| G | Status | lista rozwijana: Na terenie, Wyszedł na stałe | skrypt przy rejestracji („Na terenie”), potem obsługa | Na terenie |
+| H | Data przyjścia | data i godzina, format `yyyy-mm-dd hh:mm`, strefa Europe/Warsaw | skrypt przy rejestracji | 2026-10-25 10:42 |
+| I | Data wyjścia | data i godzina, ten sam format | skrypt po zmianie „Status” na „Wyszedł na stałe” | 2026-10-25 18:05 |
 
 Karta „Bilety” (układ do potwierdzenia):
 
@@ -74,7 +80,7 @@ Karta „Bilety” (układ do potwierdzenia):
 | C | Typ Biletu | tekst | import z systemu sprzedaży |
 | D | Ksywa | tekst | import z zapisów na sesje |
 
-Pierwszy wiersz zamrożony na obu kartach. Arkusz nie ma kolumny z datą rejestracji; data zostaje w odpowiedzi API i w localStorage. Ochrona zakresu A:E na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
+Pierwszy wiersz zamrożony na obu kartach. „Data przyjścia” to ten sam moment co `registeredAt` w odpowiedzi API. Ochrona zakresów A:E i H:I na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
 
 ## Kontrakt API
 
@@ -163,8 +169,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 - [ ] Czy numer zamówienia ma stałą liczbę cyfr? Teraz reguła przyjmuje 4–12 cyfr.
 - [ ] Gdzie leżą lista wszystkich biletów i ksywy z zapisów na sesje: w jednym pliku czy w dwóch, na których kartach, w których kolumnach są numer zamówienia, typ biletu i ksywa, kto i jak często je aktualizuje?
 - [ ] Czy numer spoza listy biletów ma blokować rejestrację? Teraz rejestracja przechodzi z wpisem „brak na liście”.
-- [ ] Czy lista biletów ma imię i nazwisko przy każdym bilecie? Od tego zależy dopasowanie ksywy i typu biletu do osoby.
-- [ ] Jakie wartości ma kolumna „Status” i kto ją wypełnia?
+- [ ] Czy trzeba rejestrować wyjścia tymczasowe (wyjście i powrót tego samego dnia)? Teraz „Status” ma tylko „Na terenie” i „Wyszedł na stałe”.
 - [ ] Nazwa, data i miejsce wydarzenia (tekst na stronie i slug w kluczu localStorage).
 - [ ] Ile osób się spodziewacie i w jakim oknie czasowym rejestrują się najczęściej?
 - [ ] Czy ID (Lp) ma zaczynać się od 1, czy od innej liczby (np. 100, żeby każde ID miało trzy cyfry)?
@@ -176,14 +181,14 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 ### Kolejność prac
 
-1. Utwórz arkusz z kartą „Rejestracje” (A–G: Lp, Imię i Nazwisko Podane w formularz, Ksywa, Nr Zamówienia, Typ Biletu, Działanie, Status) i format tekstu w kolumnie D.
+1. Utwórz arkusz z kartą „Rejestracje” (A–I: Lp, Imię i Nazwisko Podane w formularz, Ksywa, Nr Zamówienia, Typ Biletu, Działanie, Status, Data przyjścia, Data wyjścia), format tekstu w kolumnie D, lista rozwijana w G, format daty i godziny w H i I.
 2. Dodaj kartę „Bilety” i zaimportuj listę wszystkich biletów z ksywami.
 3. Załóż repozytorium z projektem Vite (React + TypeScript) i Tailwind oraz katalogiem `apps-script/` pod clasp.
 4. Napisz `doPost`, wyślij go przez `clasp push`, wpisz `SHEET_ID` we Właściwościach skryptu, wdróż jako aplikację internetową.
 5. Sprawdź API z konsoli przeglądarki jednym `fetch` (sukces, duplikat, błędne dane, numer spoza listy).
 6. Zbuduj stronę: formularz, walidacja, wysyłanie z ponawianiem, ekran z ID, localStorage.
 7. Wypchnij repozytorium na GitHub, ustaw Pages na „GitHub Actions” i sprawdź publikację.
-8. Przejdź testy T1–T11 na Androidzie i iPhonie.
+8. Przejdź testy T1–T13 na Androidzie i iPhonie.
 9. Wygeneruj kod QR z adresem strony na plakat.
 10. Wyczyść wiersze testowe przed wydarzeniem.
 
@@ -191,7 +196,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 | ID | Scenariusz | Oczekiwany wynik |
 | --- | --- | --- |
-| T1 | Pierwsza rejestracja z numerem z listy biletów | ekran z ID = 1, nowy wiersz z ksywą i typem biletu z karty „Bilety” |
+| T1 | Pierwsza rejestracja z numerem z listy biletów | ekran z ID = 1, nowy wiersz z ksywą i typem biletu z karty „Bilety”, „Status” = „Na terenie”, „Data przyjścia” = czas rejestracji |
 | T2 | Odświeżenie strony po rejestracji | ekran z tym samym ID, brak wywołania API |
 | T3 | Ten sam numer i to samo imię z inicjałem na innym telefonie | komunikat `DUPLICATE`, liczba wierszy bez zmian |
 | T4 | Ten sam numer ze spacją („3012 456”) i to samo imię z inicjałem | traktowany jak duplikat po usunięciu spacji |
@@ -202,3 +207,5 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | T9 | Poprawny numer spoza listy biletów | rejestracja przechodzi, „Ksywa” pusta, „Typ Biletu” = „brak na liście” |
 | T10 | Numer z literą („301245a”) | odrzucony na stronie, komunikat przy polu |
 | T11 | Ten sam numer, inna osoba z zamówienia | nowy wiersz z kolejnym Lp, ksywą i typem biletu tej osoby |
+| T12 | Obsługa zmienia „Status” na „Wyszedł na stałe” | „Data wyjścia” dostaje bieżącą datę i godzinę |
+| T13 | Obsługa zmienia „Status” z powrotem na „Na terenie” | „Data wyjścia” jest czyszczona |
