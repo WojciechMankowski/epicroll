@@ -29,7 +29,9 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── validation.js              walidacja żądania (funkcje bez efektów ubocznych)
 │   ├── validation.test.js         testy Vitest, ładują validation.js w Node
 │   ├── registrations.js           odczyt karty „Rejestracje”, wykrywanie duplikatów
-│   └── registrations.test.js
+│   ├── registrations.test.js
+│   ├── tickets.js                 wyszukiwanie ksywy i typu biletu w liście biletów
+│   └── tickets.test.js
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    stan ekranu i przejścia
