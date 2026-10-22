@@ -48,8 +48,8 @@ Testy:
 
 1. Funkcje czyste: walidacja trzech pól, pułapka `website`, usuwanie spacji z numeru. Warunkowy eksport, żeby dało się je testować w Node.
 2. Odczyt kolumn A, B i D oraz wykrywanie duplikatu: ten sam numer i to samo „Imię I.”.
-3. Wyszukiwanie ksywy i typu biletu w arkuszu z listą biletów po numerze, imieniu i inicjale nazwiska; brak dopasowania daje pustą ksywę i „brak na liście”.
-4. Nadanie Lp (największa wartość w A + 1) i zapis wiersza pod blokadą `LockService`, ze „Status” = „Na terenie” i bieżącą datą w „Data przyjścia”.
+3. Wyszukiwanie ksywy i typu biletu w arkuszu z listą biletów (kolumny rozpoznawane po nagłówkach) po numerze, imieniu i inicjale nazwiska; brak dopasowania daje pustą ksywę i „brak na liście”.
+4. Nadanie Lp (największa wartość w A + 1) i zapis wiersza pod blokadą `LockService`, ze „Status” = „Na terenie” i bieżącą datą w „Data wejścia”.
 5. Funkcja `json()`, `try/catch` wokół `doPost`, logowanie błędów.
 6. `SHEET_ID` i `TICKETS_SHEET_ID` we Właściwościach skryptu, wdrożenie jako aplikacja internetowa.
 7. Wyzwalacz instalowany `onStatusEdit`: „Wyszedł na stałe” w G wpisuje datę do I, „Na terenie” czyści I. Funkcja `installTriggers()` uruchomiona raz.
@@ -57,7 +57,7 @@ Testy:
 Testy:
 
 - Vitest dla funkcji z kroku 1: numer z literą odrzucony, numer ze spacjami przyjęty, imię zaczynające się od „=” odrzucone, inicjał z dwóch liter odrzucony.
-- Skrypt w Node wywołujący adres `/exec`: pierwsza rejestracja (sukces z ksywą i typem z listy, „Na terenie” i „Data przyjścia” w arkuszu), ten sam numer i imię (`DUPLICATE`, T3), ten sam numer ze spacją i to samo imię (`DUPLICATE`, T4), ten sam numer z inną osobą z zamówienia (sukces, nowe Lp, T11), numer spoza listy (sukces z „brak na liście”, T9), wypełnione `website` (`VALIDATION`).
+- Skrypt w Node wywołujący adres `/exec`: pierwsza rejestracja (sukces z ksywą i typem z listy, „Na terenie” i „Data wejścia” w arkuszu), ten sam numer i imię (`DUPLICATE`, T3), ten sam numer ze spacją i to samo imię (`DUPLICATE`, T4), ten sam numer z inną osobą z zamówienia (sukces, nowe Lp, T11), numer spoza listy (sukces z „brak na liście”, T9), wypełnione `website` (`VALIDATION`).
 - Ręcznie w arkuszu: zmiana „Status” na „Wyszedł na stałe” wpisuje „Data wyjścia” (T12), powrót na „Na terenie” ją czyści (T13).
 - T7: 25 równoległych żądań daje 25 wierszy z Lp 1–25 bez luk i powtórzeń; skrypt zapisuje czasy odpowiedzi.
 - Po testach skrypt czyści wiersze testowe.

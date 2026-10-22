@@ -50,7 +50,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 | F9 | Przy ponownym wejściu strona odczytuje localStorage i od razu pokazuje ekran z ID, bez formularza i bez wywołania serwera. | Wymaganie |
 | F10 | Ekran z ID pokazuje duży numer ID, „Imię I.”, ksywę, numer zamówienia, typ biletu i instrukcję „Pokaż ten ekran obsłudze”. Działa bez internetu. | Wymaganie |
 | F11 | Obsługa wpisuje uwagi w kolumnie „Działanie” (wolny tekst). Strona uczestnika nie czyta kolumn F–I. | Wymaganie |
-| F12 | Przy rejestracji serwer wpisuje „Na terenie” w kolumnie „Status” i bieżącą datę z godziną w kolumnie „Data przyjścia”. | Wymaganie |
+| F12 | Przy rejestracji serwer wpisuje „Na terenie” w kolumnie „Status” i bieżącą datę z godziną w kolumnie „Data wejścia”. | Wymaganie |
 | F13 | Gdy obsługa zmieni „Status” na „Wyszedł na stałe”, skrypt wpisuje bieżącą datę z godziną w kolumnie „Data wyjścia”. Powrót do „Na terenie” czyści „Data wyjścia”. | Wymaganie (czyszczenie: założenie) |
 
 ## Struktura arkusza Google
@@ -68,19 +68,21 @@ Karta „Rejestracje”:
 | E | Typ Biletu | wartość z arkusza z listą biletów albo „brak na liście” | skrypt | (wartość z listy biletów) |
 | F | Działanie | wolny tekst | obsługa | (uwagi obsługi) |
 | G | Status | lista rozwijana: Na terenie, Wyszedł na stałe | skrypt przy rejestracji („Na terenie”), potem obsługa | Na terenie |
-| H | Data przyjścia | data i godzina, format `yyyy-mm-dd hh:mm`, strefa Europe/Warsaw | skrypt przy rejestracji | 2026-12-05 10:42 |
+| H | Data wejścia | data i godzina, format `yyyy-mm-dd hh:mm`, strefa Europe/Warsaw | skrypt przy rejestracji | 2026-12-05 10:42 |
 | I | Data wyjścia | data i godzina, ten sam format | skrypt po zmianie „Status” na „Wyszedł na stałe” | 2026-12-05 18:05 |
 
-Arkusz z listą biletów (osobny plik, pierwsza karta, jedna osoba w wierszu). Skrypt czyta kolumny B–E, pozostałe pomija:
+Arkusz z listą biletów (osobny plik, pierwsza karta, jedna osoba w wierszu). Skrypt szuka kolumn po nagłówkach z wiersza 1, więc kolejność kolumn i dodatkowe kolumny (Lp, Działanie, Status i inne) nie mają znaczenia. Nagłówki porównuje bez spacji na końcach i bez rozróżniania wielkości liter:
 
-| Kolumna | Nagłówek | Skrypt używa do |
-| --- | --- | --- |
-| B | Imię i Nazwisko Podane w formularz | dopasowania imienia i inicjału nazwiska |
-| C | Ksywa | przepisania do arkusza obsługi |
-| D | Nr Zamówienia | dopasowania numeru |
-| E | Typ Biletu | przepisania do arkusza obsługi |
+| Nagłówek | Skrypt używa do |
+| --- | --- |
+| zaczyna się od „Imię i Nazwisko” | dopasowania imienia i inicjału nazwiska |
+| Ksywa | przepisania do arkusza obsługi |
+| Nr Zamówienia | dopasowania numeru |
+| Typ Biletu | przepisania do arkusza obsługi |
 
-Pierwszy wiersz zamrożony w obu arkuszach. Skrypt tylko czyta arkusz z listą biletów i robi to przy każdej rejestracji. Organizator poprawia listę dzień przed wydarzeniem (dopisuje i usuwa osoby); zmiany działają od razu, bez importu. „Data przyjścia” to ten sam moment co `registeredAt` w odpowiedzi API. Ochrona zakresów A:E i H:I na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
+Gdy któregoś nagłówka brakuje, rejestracja kończy się błędem `SERVER`, a skrypt zapisuje w logach, którego nagłówka nie znalazł.
+
+Pierwszy wiersz zamrożony w obu arkuszach. Skrypt tylko czyta arkusz z listą biletów i robi to przy każdej rejestracji. Organizator poprawia listę dzień przed wydarzeniem (dopisuje i usuwa osoby); zmiany działają od razu, bez importu. „Data wejścia” to ten sam moment co `registeredAt` w odpowiedzi API. Ochrona zakresów A:E i H:I na karcie „Rejestracje” ogranicza ręczne zmiany do właściciela arkusza; skrypt działa z jego uprawnieniami, więc zapis nadal przechodzi.
 
 ## Kontrakt API
 
@@ -178,7 +180,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 ### Kolejność prac
 
-1. Utwórz arkusz z kartą „Rejestracje” (A–I: Lp, Imię i Nazwisko Podane w formularz, Ksywa, Nr Zamówienia, Typ Biletu, Działanie, Status, Data przyjścia, Data wyjścia), format tekstu w kolumnie D, lista rozwijana w G, format daty i godziny w H i I.
+1. Utwórz arkusz z kartą „Rejestracje” (A–I: Lp, Imię i Nazwisko Podane w formularz, Ksywa, Nr Zamówienia, Typ Biletu, Działanie, Status, Data wejścia, Data wyjścia), format tekstu w kolumnie D, lista rozwijana w G, format daty i godziny w H i I.
 2. Przygotuj osobny arkusz z listą biletów (te same nagłówki co arkusz obsługi) i udostępnij go właścicielowi skryptu.
 3. Załóż repozytorium z projektem Vite (React + TypeScript) i Tailwind oraz katalogiem `apps-script/` pod clasp.
 4. Napisz `doPost`, wyślij go przez `clasp push`, wpisz `SHEET_ID` we Właściwościach skryptu, wdróż jako aplikację internetową.
@@ -193,7 +195,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 
 | ID | Scenariusz | Oczekiwany wynik |
 | --- | --- | --- |
-| T1 | Pierwsza rejestracja z numerem z listy biletów | ekran z ID = 1, nowy wiersz z ksywą i typem biletu z arkusza z listą biletów, „Status” = „Na terenie”, „Data przyjścia” = czas rejestracji |
+| T1 | Pierwsza rejestracja z numerem z listy biletów | ekran z ID = 1, nowy wiersz z ksywą i typem biletu z arkusza z listą biletów, „Status” = „Na terenie”, „Data wejścia” = czas rejestracji |
 | T2 | Odświeżenie strony po rejestracji | ekran z tym samym ID, brak wywołania API |
 | T3 | Ten sam numer i to samo imię z inicjałem na innym telefonie | komunikat `DUPLICATE`, liczba wierszy bez zmian |
 | T4 | Ten sam numer ze spacją („3012 456”) i to samo imię z inicjałem | traktowany jak duplikat po usunięciu spacji |
