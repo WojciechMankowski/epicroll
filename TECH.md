@@ -27,7 +27,9 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── appsscript.json            manifest: strefa czasowa, V8, ustawienia aplikacji internetowej
 │   ├── Code.js                    doPost i funkcje pomocnicze
 │   ├── validation.js              walidacja żądania (funkcje bez efektów ubocznych)
-│   └── validation.test.js         testy Vitest, ładują validation.js w Node
+│   ├── validation.test.js         testy Vitest, ładują validation.js w Node
+│   ├── registrations.js           odczyt karty „Rejestracje”, wykrywanie duplikatów
+│   └── registrations.test.js
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    stan ekranu i przejścia
@@ -145,7 +147,7 @@ Identyfikatory obu arkuszy leżą we Właściwościach skryptu i nie trafiają d
 2. Usuń spacje z numeru zamówienia.
 3. Załóż blokadę `LockService.getScriptLock().tryLock(10000)`. Brak blokady → `BUSY`.
 4. Odczytaj kolumny A, B i D karty „Rejestracje” jednym `getValues()`.
-5. Jest wiersz z tym samym numerem w D (porównanie jako tekst, `String(v).trim()`) i tym samym „Imię I.” w B (bez rozróżniania wielkości liter) → zwolnij blokadę, zwróć `DUPLICATE`.
+5. Jest wiersz z tym samym numerem w D (porównanie jako tekst, `String(v).trim()`) i tą samą osobą w B → zwolnij blokadę, zwróć `DUPLICATE`. Osobę porównuje `personKey`: imiona i pierwsza litera ostatniego wyrazu, bez wielkości liter i nadmiarowych spacji. „Anna K.” i dopisana ręcznie „Anna Kowalska” to ta sama osoba (`apps-script/registrations.js`).
 6. Odczytaj pierwszą kartę arkusza `TICKETS_SHEET_ID` jednym `getDataRange().getValues()`. Z wiersza 1 ustal numery kolumn po nagłówkach (funkcja `findColumns`: nagłówek zaczynający się od „Imię i Nazwisko”, „Ksywa”, „Nr Zamówienia”, „Typ Biletu”; porównanie po `trim()` i bez wielkości liter). Znajdź wiersz z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od inicjału (porównanie po `trim()`, bez wielkości liter, z polskimi znakami). Weź z niego ksywę i typ biletu. Brak nagłówka → `SERVER` i `console.error` z jego nazwą. Odczyt listy może być przed założeniem blokady, bo skrypt jej nie zmienia. Brak → pusta ksywa i „brak na liście”.
 7. Nowe ID = największa wartość w kolumnie A + 1 (działa także po ręcznym usunięciu wiersza).
 8. `appendRow([id, "Anna K.", ksywa, numer, typBiletu, "", "Na terenie", teraz, ""])`, gdzie `teraz = new Date()`, potem `SpreadsheetApp.flush()`.
