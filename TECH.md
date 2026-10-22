@@ -38,7 +38,9 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── triggers.js                installTriggers, onStatusEdit: data wyjścia po zmianie „Status”
 │   ├── triggers.test.js
 │   └── diagnoza.js                sprawdzenie konfiguracji z edytora Apps Script
+├── public/                        favicon.svg (kostka k20), ikony PWA 192/512, maskable, apple-touch-icon
 ├── scripts/api-test.mjs           testy M3.T działającego API: npm run test:api -- <adres /exec>
+├── scripts/check-build.mjs        sprawdzenie builda: plik usługi, manifest, ikony (npm run check:build, też w workflow)
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    widok ekranów (formularz, wysyłanie, ekran z ID, błąd)
@@ -129,6 +131,17 @@ Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`
 | Numer zamówienia (po usunięciu spacji) | `^\d{7}$` |
 | Imię | `^[\p{L}][\p{L} -]{1,29}$` (flaga `u`) |
 | Inicjał nazwiska | `^\p{L}$` (flaga `u`) |
+
+### Działanie bez internetu (PWA)
+
+`vite-plugin-pwa` w `vite.config.ts` tworzy plik usługi (`sw.js`) i manifest. Po pierwszym wejściu telefon zapisuje pliki strony: HTML, JS, CSS, ikony i fonty w podzbiorach łacińskich z polskimi znakami (25 plików, około 500 KB). Przy kolejnym otwarciu bez internetu strona wczytuje się z telefonu i od razu pokazuje ekran z ID z localStorage (F10). Odpowiedzi API nie są zapisywane: rejestracja zawsze wymaga sieci.
+
+- `registerType: 'autoUpdate'` i `registerSW({ immediate: true })` w `main.tsx`: nowa wersja instaluje się w tle i działa po kolejnym otwarciu strony.
+- `start_url` i `scope` to `/epicroll/`, tak jak `base`.
+- `npm run check:build` (także w workflow po buildzie) sprawdza, że `dist/` ma `sw.js` z `index.html` i fontami `latin-ext`, `manifest.webmanifest` z właściwym `start_url` i ikoną 512×512 oraz że `sw.js` nie zapisuje odpowiedzi z `script.google.com`.
+- `index.html`: `viewport-fit=cover` (a w `App.tsx` marginesy `env(safe-area-inset-*)`), `theme-color`, ikona kostki i `apple-touch-icon`.
+
+Sprawdzone 22.10.2026 w Chromium: pierwsze wejście online, wyłączenie sieci, ponowne otwarcie, ekran z ID z właściwymi fontami.
 
 ### Tailwind
 

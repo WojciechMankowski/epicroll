@@ -48,7 +48,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 | F7 | Serwer szuka w osobnym arkuszu z listą biletów wiersza z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od podanego inicjału. Z tego wiersza wpisuje ksywę do kolumny „Ksywa”, a typ do kolumny „Typ Biletu”. Gdy takiego wiersza nie ma, „Ksywa” zostaje pusta, „Typ Biletu” dostaje „brak na liście”, a rejestracja przechodzi. | Wymaganie (zachowanie przy braku: założenie) |
 | F8 | Strona zapisuje w localStorage ID, numer zamówienia, imię, inicjał, ksywę, typ biletu i czas rejestracji. | Wymaganie |
 | F9 | Przy ponownym wejściu strona odczytuje localStorage i od razu pokazuje ekran z ID, bez formularza i bez wywołania serwera. | Wymaganie |
-| F10 | Ekran z ID pokazuje duży numer ID, „Imię I.”, ksywę, numer zamówienia, typ biletu, godzinę rejestracji w czasie polskim („Zarejestrowano 5 grudnia, 09:42”) i instrukcję „Pokaż ten ekran obsłudze”. Działa bez internetu. | Wymaganie |
+| F10 | Ekran z ID pokazuje duży numer ID, „Imię I.”, ksywę, numer zamówienia, typ biletu, godzinę rejestracji w czasie polskim („Zarejestrowano 5 grudnia, 09:42”) i instrukcję „Pokaż ten ekran obsłudze”. Działa bez internetu, także po zamknięciu i ponownym otwarciu strony: po pierwszym wejściu telefon zapisuje stronę (PWA), a rejestracja jest w localStorage. | Wymaganie |
 | F11 | Obsługa wpisuje uwagi w kolumnie „Działanie” (wolny tekst). Strona uczestnika nie czyta kolumn F–I. | Wymaganie |
 | F12 | Przy rejestracji serwer wpisuje „Na terenie” w kolumnie „Status” i bieżącą datę z godziną w kolumnie „Data wejścia”. | Wymaganie |
 | F13 | Gdy obsługa zmieni „Status” na „Wyszedł na stałe”, skrypt wpisuje bieżącą datę z godziną w kolumnie „Data wyjścia”. Powrót do „Na terenie” czyści „Data wyjścia”. | Wymaganie (czyszczenie: założenie) |
@@ -155,6 +155,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | Uczestnik wyczyści przeglądarkę lub zmieni telefon | traci ekran z ID, ponowna próba daje `DUPLICATE` | obsługa szuka po kolumnie „Nr Zamówienia” |
 | Publiczny adres API | spam w arkuszu | pułapka `website`, limity długości, reguły znaków; filtr w arkuszu przy sprzątaniu |
 | Pierwsze wywołanie Apps Script po przerwie trwa dłużej | uczestnik klika ponownie | blokada przycisku (F3), tekst „Rejestruję…” |
+| Telefon pokazuje starą wersję strony zapisaną przed wdrożeniem poprawki | uczestnik widzi poprzedni wygląd lub teksty | nowa wersja instaluje się w tle i działa po kolejnym otwarciu (`registerType: 'autoUpdate'`); ostatnie wdrożenie najpóźniej dzień przed wydarzeniem |
 | Szczyt rejestracji przy wejściu | kolejka na blokadzie (przy 25 osobach naraz ostatnia czeka do 15 s), odpowiedzi `BUSY`, przekroczenie limitu 30 równoczesnych wykonań | limit oczekiwania strony 30 s, automatyczne ponowienie (2 próby), przycisk „Spróbuj ponownie”; przyspieszenie API po pokazie |
 
 ## Poza zakresem

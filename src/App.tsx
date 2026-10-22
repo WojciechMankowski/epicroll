@@ -13,7 +13,12 @@ export default function App({ deps }: Props) {
   const { state, submit, retry, backToForm } = useRegistration(deps)
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pt-8 pb-12">
+    <main
+      // Odstępy od wycięcia na aparat i paska iPhone'a (viewport-fit=cover w index.html).
+      className="mx-auto flex min-h-dvh max-w-md flex-col
+        pt-[max(2rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))]
+        pb-[max(3rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]"
+    >
       <header className="mb-10">
         <h1 className="font-display text-6xl leading-[0.9] font-extrabold tracking-tight">{EVENT_NAME}</h1>
         <p className="mt-3 text-lg leading-snug text-muted">

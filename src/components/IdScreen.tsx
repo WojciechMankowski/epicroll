@@ -64,7 +64,7 @@ export function IdScreen({ registration, saved }: Props) {
         </div>
 
         <div className="flex flex-col items-start gap-2">
-          <p className="text-3xl font-semibold">{registration.firstName} {registration.lastInitial}.</p>
+          <p className="text-3xl font-semibold">{registration.firstName}{'\u00a0'}{registration.lastInitial}.</p>
           {registration.nickname && <p className="text-xl text-brass">{registration.nickname}</p>}
           {registration.ticketType && (
             <p className="rounded-full border border-paper/50 px-3 py-0.5 text-lg">{registration.ticketType}</p>

@@ -23,5 +23,5 @@ M1 i M2 powstały przed tą zasadą, M2 jest bezpośrednio na `main`.
 
 - `npm test` (Vitest)
 - `npm run lint` (oxlint)
-- `npm run build`
+- `npm run build`, potem `npm run check:build` (plik usługi i manifest PWA)
 - `npm run test:api -- <adres /exec>`: testy działającego API (zapisuje wiersze w arkuszu testowym; potem je usunąć)

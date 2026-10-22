@@ -36,7 +36,7 @@ export function ErrorScreen({ error, values, onRetry, onEdit }: Props) {
           </div>
           <div className="flex gap-1">
             <dt className="sr-only">Osoba</dt>
-            <dd className="font-medium text-ink">{values.firstName} {values.lastInitial}.</dd>
+            <dd className="font-medium text-ink">{values.firstName}{'\u00a0'}{values.lastInitial}.</dd>
           </div>
         </dl>
       </div>
