@@ -25,7 +25,8 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 ├── apps-script/
 │   ├── .clasp.json                scriptId projektu Apps Script
 │   ├── appsscript.json            manifest: strefa czasowa, V8, ustawienia aplikacji internetowej
-│   ├── Code.js                    doPost i funkcje pomocnicze
+│   ├── Code.js                    doPost, handleRequest (walidacja → registerPerson, błędy → SERVER), productionEnv
+│   ├── Code.test.js               testy całego API na atrapach usług Google
 │   ├── validation.js              walidacja żądania (funkcje bez efektów ubocznych)
 │   ├── validation.test.js         testy Vitest, ładują validation.js w Node
 │   ├── registrations.js           odczyt karty „Rejestracje”, wykrywanie duplikatów
@@ -169,7 +170,7 @@ function json(obj) {
 }
 ```
 
-Nieprzewidziany wyjątek łapie `try/catch` wokół całego `doPost`, zapisuje go przez `console.error` (widać go w zakładce „Wykonania”) i zwraca `SERVER`.
+Nieprzewidziany wyjątek (także brak `SHEET_ID`, `TICKETS_SHEET_ID` albo karty „Rejestracje”) łapie `try/catch` w `handleRequest`, zapisuje go przez `console.error` (widać go w zakładce „Wykonania”) i zwraca `SERVER`.
 
 ### Data wyjścia: wyzwalacz przy edycji
 
