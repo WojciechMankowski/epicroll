@@ -41,7 +41,8 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 ├── scripts/api-test.mjs           testy M3.T działającego API: npm run test:api -- <adres /exec>
 ├── src/
 │   ├── main.tsx
-│   ├── App.tsx                    stan ekranu i przejścia
+│   ├── App.tsx                    widok ekranów (formularz, wysyłanie, ekran z ID, błąd)
+│   ├── useRegistration.ts         stany ekranu i przejścia, komunikaty błędów
 │   ├── api.ts                     wywołanie API, typy żądania i odpowiedzi, ponawianie
 │   ├── storage.ts                 odczyt i zapis localStorage w try/catch
 │   ├── validation.ts              reguły pól (te same co w apps-script/validation.js)
@@ -99,26 +100,26 @@ Ciało typu string wysyła się domyślnie jako `text/plain;charset=UTF-8`. Taki
 
 Limit czasu: `api.ts` czeka na odpowiedź do 30 s (`AbortController`). Krótszy limit jest ryzykowny: w teście T7 odpowiedzi trwały do 15 s, a przerwane żądanie mogło już zapisać wiersz, więc ponowienie dałoby `DUPLICATE`.
 
-Ponawianie: przy `BUSY` albo błędzie sieci `api.ts` ponawia żądanie automatycznie do 2 razy, po 1 s i po 2 s. Gdy nadal się nie uda, strona pokazuje komunikat i przycisk „Spróbuj ponownie”. `DUPLICATE` i `VALIDATION` nie są ponawiane.
+Ponawianie: przy `BUSY` albo błędzie sieci `registerAttendee` w `api.ts` ponawia żądanie automatycznie do 2 razy, po 1 s i po 2 s. Przekroczenia limitu czasu nie ponawia i zwraca `SERVER`. Odpowiedź, która nie jest JSON-em albo nie ma kształtu z kontraktu (`parseResponse`), też daje `SERVER`. Gdy nadal się nie uda, strona pokazuje komunikat i przycisk „Spróbuj ponownie”. `DUPLICATE` i `VALIDATION` nie są ponawiane.
 
-### Stany ekranu w `App.tsx`
+### Stany ekranu (`useRegistration.ts`)
 
 | Stan | Kiedy | Co widać |
 | --- | --- | --- |
 | `form` | brak wpisu w localStorage | formularz z trzema polami |
 | `sending` | po kliknięciu „Zarejestruj” | zablokowany przycisk, „Rejestruję…” |
 | `done` | `ok: true` albo wpis w localStorage przy starcie | `IdScreen` |
-| `error` | `DUPLICATE`, `BUSY` lub `SERVER` po ponowieniach | komunikat, przy `BUSY`/`SERVER` przycisk „Spróbuj ponownie” |
+| `error` | `DUPLICATE`, `BUSY` lub `SERVER` po ponowieniach | komunikat, przy `BUSY`/`SERVER` przycisk „Spróbuj ponownie”, zawsze „Popraw dane” (powrót do formularza z wpisanymi danymi) |
 
 Błąd `VALIDATION` wraca do stanu `form` z komunikatem przy polu z `field`.
 
 ### localStorage
 
-Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`, `firstName`, `lastInitial`, `nickname`, `ticketType`, `registeredAt`. `storage.ts` opakowuje `getItem` i `setItem` w `try/catch`. Gdy zapis się nie uda (tryb prywatny), `IdScreen` pokazuje prośbę o zrzut ekranu.
+Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`, `firstName`, `lastInitial`, `nickname`, `ticketType`, `registeredAt`. `storage.ts` ma dwie funkcje: `loadRegistration` zwraca zapisaną rejestrację albo `null` (brak wpisu, uszkodzony JSON, wpis bez wymaganych pól, niedostępny localStorage), a `saveRegistration` zwraca `false`, gdy zapis się nie udał. Każdy dostęp do localStorage, także samo odwołanie do `window.localStorage`, jest w `try/catch`. Gdy zapis się nie uda (tryb prywatny), `IdScreen` pokazuje prośbę o zrzut ekranu.
 
 ### Walidacja
 
-`src/validation.ts` i `apps-script/validation.js` mają te same wyrażenia regularne i przechodzą te same przypadki z `test-data/validation-cases.json`. Przy zmianie reguły trzeba poprawić oba pliki i przypadki testowe.
+`src/validation.ts` i `apps-script/validation.js` mają te same wyrażenia regularne i przechodzą te same przypadki z `test-data/validation-cases.json`. Przy zmianie reguły trzeba poprawić oba pliki i przypadki testowe. Na stronie formularz sprawdza `validateForm`: zwraca znormalizowane wartości albo komunikat ze SPEC.md przy każdym błędnym polu naraz. `validateRegistration` w `src/validation.ts` podejmuje tę samą decyzję co API i służy do testu zgodności na wspólnych przypadkach.
 
 | Pole | Wyrażenie |
 | --- | --- |
