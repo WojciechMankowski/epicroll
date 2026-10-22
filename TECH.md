@@ -114,7 +114,7 @@ Błąd `VALIDATION` wraca do stanu `form` z komunikatem przy polu z `field`.
 
 ### localStorage
 
-Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`, `firstName`, `lastInitial`, `nickname`, `ticketType`, `registeredAt`. `storage.ts` opakowuje `getItem` i `setItem` w `try/catch`. Gdy zapis się nie uda (tryb prywatny), `IdScreen` pokazuje prośbę o zrzut ekranu.
+Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`, `firstName`, `lastInitial`, `nickname`, `ticketType`, `registeredAt`. `storage.ts` ma dwie funkcje: `loadRegistration` zwraca zapisaną rejestrację albo `null` (brak wpisu, uszkodzony JSON, wpis bez wymaganych pól, niedostępny localStorage), a `saveRegistration` zwraca `false`, gdy zapis się nie udał. Każdy dostęp do localStorage, także samo odwołanie do `window.localStorage`, jest w `try/catch`. Gdy zapis się nie uda (tryb prywatny), `IdScreen` pokazuje prośbę o zrzut ekranu.
 
 ### Walidacja
 
