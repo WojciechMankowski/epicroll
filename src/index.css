@@ -1,1 +1,47 @@
 @import "tailwindcss";
+
+/* Fonty dołączone do strony (nie z Google Fonts): ekran z ID działa też bez internetu (F10). */
+@import "@fontsource/barlow/400.css";
+@import "@fontsource/barlow/500.css";
+@import "@fontsource/barlow/600.css";
+@import "@fontsource/barlow-condensed/700.css";
+@import "@fontsource/barlow-condensed/800.css";
+
+/*
+ * Tokeny wyglądu EPIC ROLL. Granat i mosiądz: szkoła okrętowa (Conradinum) i kostki do gry.
+ * Kolory organizatora, jeśli będą, podmienia się tylko tutaj.
+ */
+@theme {
+  --color-ink: #16213e; /* tekst, przyciski, tło ekranu z ID */
+  --color-paper: #f4f6f9; /* tło strony */
+  --color-brass: #b8862b; /* tylko na granacie: obrys kostki, fokus na ciemnym tle */
+  --color-mist: #dce2ea; /* ramki pól, linie */
+  --color-muted: #4a5568; /* tekst pomocniczy (kontrast 7:1 na tle) */
+  --color-alert: #b42318; /* błędy */
+
+  --font-sans: "Barlow", system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Barlow", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}

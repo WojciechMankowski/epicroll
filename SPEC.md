@@ -39,7 +39,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 
 | ID | Wymaganie | Źródło |
 | --- | --- | --- |
-| F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. Nagłówek strony i ekranu z ID to „EPIC ROLL”, pod nim „5 grudnia 2026 · Szkoły Okrętowe i Techniczne Conradinum, Gdańsk”. | Wymaganie |
+| F1 | Formularz ma trzy pola: numer zamówienia, imię, pierwsza litera nazwiska. Wszystkie są wymagane. Uczestnik nie wpisuje ksywy w dniu imprezy. Nagłówek strony i ekranu z ID to „EPIC ROLL”, pod nim data „5 grudnia 2026” i miejsce „Szkoły Okrętowe i Techniczne Conradinum, Gdańsk”. | Wymaganie |
 | F2 | Strona sprawdza dane przed wysłaniem (reguły w sekcji „Walidacja i komunikaty”). Serwer sprawdza je ponownie. | Założenie |
 | F3 | Przycisk „Zarejestruj” blokuje się na czas wysyłania, żeby jedno kliknięcie dawało jeden wiersz. | Założenie |
 | F4 | Jedno zamówienie może obejmować kilka osób o różnych imionach i nazwiskach. Duplikat to wiersz z tym samym numerem zamówienia i tą samą osobą: to samo imię i ta sama pierwsza litera nazwiska, bez rozróżniania wielkości liter. „Anna K.” i dopisana ręcznie „Anna Kowalska” to ta sama osoba. Serwer przed porównaniem usuwa spacje z numeru. | Wymaganie |
@@ -48,7 +48,7 @@ Przy pierwszym wejściu uczestnik przechodzi formularz i dostaje ID z arkusza. P
 | F7 | Serwer szuka w osobnym arkuszu z listą biletów wiersza z tym numerem zamówienia, w którym imię zgadza się z podanym, a nazwisko zaczyna się od podanego inicjału. Z tego wiersza wpisuje ksywę do kolumny „Ksywa”, a typ do kolumny „Typ Biletu”. Gdy takiego wiersza nie ma, „Ksywa” zostaje pusta, „Typ Biletu” dostaje „brak na liście”, a rejestracja przechodzi. | Wymaganie (zachowanie przy braku: założenie) |
 | F8 | Strona zapisuje w localStorage ID, numer zamówienia, imię, inicjał, ksywę, typ biletu i czas rejestracji. | Wymaganie |
 | F9 | Przy ponownym wejściu strona odczytuje localStorage i od razu pokazuje ekran z ID, bez formularza i bez wywołania serwera. | Wymaganie |
-| F10 | Ekran z ID pokazuje duży numer ID, „Imię I.”, ksywę, numer zamówienia, typ biletu i instrukcję „Pokaż ten ekran obsłudze”. Działa bez internetu. | Wymaganie |
+| F10 | Ekran z ID pokazuje duży numer ID, „Imię I.”, ksywę, numer zamówienia, typ biletu, godzinę rejestracji w czasie polskim („Zarejestrowano 5 grudnia, 09:42”) i instrukcję „Pokaż ten ekran obsłudze”. Działa bez internetu, także po zamknięciu i ponownym otwarciu strony: po pierwszym wejściu telefon zapisuje stronę (PWA), a rejestracja jest w localStorage. | Wymaganie |
 | F11 | Obsługa wpisuje uwagi w kolumnie „Działanie” (wolny tekst). Strona uczestnika nie czyta kolumn F–I. | Wymaganie |
 | F12 | Przy rejestracji serwer wpisuje „Na terenie” w kolumnie „Status” i bieżącą datę z godziną w kolumnie „Data wejścia”. | Wymaganie |
 | F13 | Gdy obsługa zmieni „Status” na „Wyszedł na stałe”, skrypt wpisuje bieżącą datę z godziną w kolumnie „Data wyjścia”. Powrót do „Na terenie” czyści „Data wyjścia”. | Wymaganie (czyszczenie: założenie) |
@@ -131,10 +131,10 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | --- | --- |
 | Trwa wysyłanie | przycisk zablokowany, tekst „Rejestruję…” |
 | `ok: true` | ekran z ID (F10) |
-| `DUPLICATE` | „Ta osoba jest już zarejestrowana z tym numerem zamówienia. Podejdź do obsługi.” + przycisk „Popraw dane” (powrót do formularza, np. przy literówce) |
+| `DUPLICATE` | tytuł „Ta rejestracja już istnieje”, komunikat „Ta osoba jest już zarejestrowana z tym numerem zamówienia. Podejdź do obsługi.”, wpisane dane, przycisk „Popraw dane” (powrót do formularza, np. przy literówce) |
 | `VALIDATION` | komunikat przy wskazanym polu |
-| `BUSY` | „Wiele osób rejestruje się naraz. Spróbuj za chwilę.” + przycisk „Spróbuj ponownie” |
-| `SERVER` lub brak sieci | „Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.” + przycisk „Spróbuj ponownie” |
+| `BUSY` | tytuł „Wiele zgłoszeń naraz”, komunikat „Wiele osób rejestruje się naraz. Spróbuj za chwilę.”, wpisane dane, przyciski „Spróbuj ponownie” i „Popraw dane” |
+| `SERVER` lub brak sieci | tytuł „Zgłoszenie nie dotarło”, komunikat „Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.”, wpisane dane, przyciski „Spróbuj ponownie” i „Popraw dane” |
 
 ## Wymagania niefunkcjonalne i ryzyka
 
@@ -145,7 +145,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | N3 | Każde pole ma etykietę `<label>`; numer ID na ekranie końcowym ma co najmniej 72 px. |
 | N4 | Interfejs po polsku. |
 | N5 | Pojedyncza rejestracja trwa około 3 s. Przy 25 równoległych rejestracjach wszystkie się zapisują; pomiar T7 z 22.10.2026: mediana 6,1 s, najdłużej 15,2 s, całość 22 s. Strona czeka na odpowiedź do 30 s i przez ten czas pokazuje „Rejestruję…”. Limit Apps Script to 30 równoczesnych wykonań. |
-| N6 | Pod formularzem krótka informacja o przetwarzaniu danych: kto zbiera, w jakim celu, kiedy usunie. Treść zatwierdza organizator jako administrator danych. |
+| N6 | Pod formularzem krótka informacja o przetwarzaniu danych: kto zbiera, w jakim celu, kiedy usunie. Treść zatwierdza organizator jako administrator danych. Wersja robocza: administrator, termin usunięcia i kontakt są w `src/event.ts` (`DATA_CONTROLLER`, `DATA_RETENTION`, `DATA_CONTACT`) i na razie są puste; puste pola pomijają swoje zdania. |
 
 | Ryzyko | Skutek | Środek zaradczy |
 | --- | --- | --- |
@@ -155,6 +155,7 @@ Te same reguły sprawdza strona i serwer. Reguły nie dopuszczają znaków `=`, 
 | Uczestnik wyczyści przeglądarkę lub zmieni telefon | traci ekran z ID, ponowna próba daje `DUPLICATE` | obsługa szuka po kolumnie „Nr Zamówienia” |
 | Publiczny adres API | spam w arkuszu | pułapka `website`, limity długości, reguły znaków; filtr w arkuszu przy sprzątaniu |
 | Pierwsze wywołanie Apps Script po przerwie trwa dłużej | uczestnik klika ponownie | blokada przycisku (F3), tekst „Rejestruję…” |
+| Telefon pokazuje starą wersję strony zapisaną przed wdrożeniem poprawki | uczestnik widzi poprzedni wygląd lub teksty | nowa wersja instaluje się w tle i działa po kolejnym otwarciu (`registerType: 'autoUpdate'`); ostatnie wdrożenie najpóźniej dzień przed wydarzeniem |
 | Szczyt rejestracji przy wejściu | kolejka na blokadzie (przy 25 osobach naraz ostatnia czeka do 15 s), odpowiedzi `BUSY`, przekroczenie limitu 30 równoczesnych wykonań | limit oczekiwania strony 30 s, automatyczne ponowienie (2 próby), przycisk „Spróbuj ponownie”; przyspieszenie API po pokazie |
 
 ## Poza zakresem
