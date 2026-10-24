@@ -38,17 +38,22 @@ Wersje pakietów: aktualne stabilne z npm w dniu założenia repozytorium, zapis
 │   ├── triggers.js                installTriggers, onStatusEdit: data wyjścia po zmianie „Status”
 │   ├── triggers.test.js
 │   └── diagnoza.js                sprawdzenie konfiguracji z edytora Apps Script
+├── public/                        favicon.svg (kostka k20), ikony PWA 192/512, maskable, apple-touch-icon
 ├── scripts/api-test.mjs           testy M3.T działającego API: npm run test:api -- <adres /exec>
+├── scripts/check-build.mjs        sprawdzenie builda: plik usługi, manifest, ikony (npm run check:build, też w workflow)
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    widok ekranów (formularz, wysyłanie, ekran z ID, błąd)
 │   ├── useRegistration.ts         stany ekranu i przejścia, komunikaty błędów
 │   ├── api.ts                     wywołanie API, typy żądania i odpowiedzi, ponawianie
+│   ├── format.ts                  godzina rejestracji w czasie polskim (Intl, Europe/Warsaw)
 │   ├── storage.ts                 odczyt i zapis localStorage w try/catch
 │   ├── validation.ts              reguły pól (te same co w apps-script/validation.js)
 │   ├── components/
 │   │   ├── RegistrationForm.tsx
-│   │   └── IdScreen.tsx
+│   │   ├── IdScreen.tsx           ekran z ID: numer w obrysie kostki k20 (SVG), osoba, godzina rejestracji
+│   │   ├── DataNotice.tsx         informacja o przetwarzaniu danych pod formularzem (N6), składana z pól w event.ts
+│   │   └── ErrorScreen.tsx        ekran błędu: tytuł, komunikat, wpisane dane, „Spróbuj ponownie” / „Popraw dane”
 │   └── index.css                  @import "tailwindcss";
 ├── test-data/validation-cases.json  przypadki testowe walidacji, wspólne dla API i strony
 ├── .env.production                VITE_API_URL=<adres /exec aplikacji Apps Script>
@@ -127,9 +132,34 @@ Klucz `rejestracja-epic-roll-v1`, wartość to JSON z polami `id`, `orderNumber`
 | Imię | `^[\p{L}][\p{L} -]{1,29}$` (flaga `u`) |
 | Inicjał nazwiska | `^\p{L}$` (flaga `u`) |
 
+### Działanie bez internetu (PWA)
+
+`vite-plugin-pwa` w `vite.config.ts` tworzy plik usługi (`sw.js`) i manifest. Po pierwszym wejściu telefon zapisuje pliki strony: HTML, JS, CSS, ikony i fonty w podzbiorach łacińskich z polskimi znakami (25 plików, około 500 KB). Przy kolejnym otwarciu bez internetu strona wczytuje się z telefonu i od razu pokazuje ekran z ID z localStorage (F10). Odpowiedzi API nie są zapisywane: rejestracja zawsze wymaga sieci.
+
+- `registerType: 'autoUpdate'` i `registerSW({ immediate: true })` w `main.tsx`: nowa wersja instaluje się w tle i działa po kolejnym otwarciu strony.
+- `start_url` i `scope` to `/epicroll/`, tak jak `base`.
+- `npm run check:build` (także w workflow po buildzie) sprawdza, że `dist/` ma `sw.js` z `index.html` i fontami `latin-ext`, `manifest.webmanifest` z właściwym `start_url` i ikoną 512×512 oraz że `sw.js` nie zapisuje odpowiedzi z `script.google.com`.
+- `index.html`: `viewport-fit=cover` (a w `App.tsx` marginesy `env(safe-area-inset-*)`), `theme-color`, ikona kostki i `apple-touch-icon`.
+
+Sprawdzone 22.10.2026 w Chromium: pierwsze wejście online, wyłączenie sieci, ponowne otwarcie, ekran z ID z właściwymi fontami.
+
 ### Tailwind
 
-Tailwind v4 nie potrzebuje pliku konfiguracyjnego: wystarczy wtyczka `@tailwindcss/vite` w `vite.config.ts` i `@import "tailwindcss";` w `index.css`. Wymagania N1 i N3 ze SPEC.md (pola 44 px, numer ID 72 px) dają się ustawić klasami `min-h-11` i `text-7xl`.
+Tailwind v4 nie potrzebuje pliku konfiguracyjnego: wystarczy wtyczka `@tailwindcss/vite` w `vite.config.ts` i `@import "tailwindcss";` w `index.css`. Wymagania N1 i N3 ze SPEC.md (pola 44 px, numer ID 72 px) spełniają pola i przyciski `h-14` (56 px) i numer ID w `text-7xl` lub większym.
+
+Tokeny wyglądu są w `@theme` w `src/index.css` i dają klasy Tailwind (`bg-ink`, `text-muted`, `font-display`):
+
+| Token | Wartość | Użycie |
+| --- | --- | --- |
+| `ink` | `#16213e` | tekst, przyciski, tło ekranu z ID |
+| `paper` | `#f4f6f9` | tło strony |
+| `brass` | `#b8862b` | tylko na granacie: obrys kostki, fokus na ciemnym tle |
+| `mist` | `#dce2ea` | ramki pól |
+| `muted` | `#4a5568` | tekst pomocniczy |
+| `alert` | `#b42318` | błędy |
+| `font-sans` / `font-display` | Barlow / Barlow Condensed | tekst / nazwa wydarzenia, nagłówki, numer ID |
+
+Fonty pochodzą z pakietów `@fontsource/barlow` i `@fontsource/barlow-condensed` i są częścią builda, bez zapytań do Google Fonts. Kolory organizatora, jeśli będą, zmienia się tylko w `@theme`.
 
 ## API (Google Apps Script)
 

@@ -10,9 +10,16 @@ export type ScreenError = 'DUPLICATE' | 'BUSY' | 'SERVER'
 
 /** Komunikaty ekranu błędu (SPEC.md „Walidacja i komunikaty”). */
 export const ERROR_MESSAGES: Record<ScreenError, string> = {
-  DUPLICATE: 'Ta osoba jest już zarejestrowana z tym numerem zamówienia. Podejdź do obsługi.',
+  DUPLICATE: 'Ta osoba jest już zarejestrowana z\u00a0tym numerem zamówienia. Podejdź do obsługi.',
   BUSY: 'Wiele osób rejestruje się naraz. Spróbuj za chwilę.',
   SERVER: 'Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.',
+}
+
+/** Tytuły ekranu błędu. */
+export const ERROR_TITLES: Record<ScreenError, string> = {
+  DUPLICATE: 'Ta rejestracja już istnieje',
+  BUSY: 'Wiele zgłoszeń naraz',
+  SERVER: 'Zgłoszenie nie dotarło',
 }
 
 export type ScreenState =

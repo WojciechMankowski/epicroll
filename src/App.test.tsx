@@ -44,7 +44,17 @@ describe('App', () => {
   it('pokazuje nazwę, datę i miejsce wydarzenia', () => {
     render(<App deps={{ register: fakeRegister(), storage: memoryStorage() }} />)
     expect(screen.getByRole('heading', { level: 1, name: 'EPIC ROLL' })).toBeInTheDocument()
-    expect(screen.getByText(/5 grudnia 2026/)).toHaveTextContent('Conradinum, Gdańsk')
+    const header = screen.getByRole('banner')
+    expect(header).toHaveTextContent('5 grudnia 2026')
+    expect(header).toHaveTextContent('Szkoły Okrętowe i Techniczne Conradinum, Gdańsk')
+  })
+
+  it('informacja o danych jest pod formularzem, a nie na ekranie z ID (N6)', async () => {
+    render(<App deps={{ register: fakeRegister(success), storage: memoryStorage() }} />)
+    expect(screen.getByTestId('data-notice')).toBeInTheDocument()
+    await fillAndSubmit()
+    await screen.findByTestId('registration-id')
+    expect(screen.queryByTestId('data-notice')).not.toBeInTheDocument()
   })
 
   it('wpis w localStorage przy starcie: ekran z ID bez formularza i bez wywołania API (T2)', () => {
@@ -74,8 +84,8 @@ describe('App', () => {
     expect(register).toHaveBeenCalledWith({ orderNumber: '3023567', firstName: 'Jasmina', lastInitial: 'K', website: '' })
     expect(await screen.findByTestId('registration-id')).toHaveTextContent('17')
     expect(screen.getByText('Jasmina K.')).toBeInTheDocument()
-    expect(screen.getByText('Ksywa: ksywa 4')).toBeInTheDocument()
-    expect(screen.getByText('Typ biletu: Gość')).toBeInTheDocument()
+    expect(screen.getByText('ksywa 4')).toBeInTheDocument()
+    expect(screen.getByText('Gość')).toBeInTheDocument()
     expect(JSON.parse(storage.getItem('rejestracja-epic-roll-v1') ?? '{}')).toMatchObject({ id: 17, orderNumber: '3023567' })
   })
 
@@ -141,7 +151,7 @@ describe('App', () => {
     render(<App deps={{ register: fakeRegister(outsider), storage: memoryStorage() }} />)
     await fillAndSubmit()
     expect(await screen.findByTestId('registration-id')).toHaveTextContent('17')
-    expect(screen.queryByText(/Ksywa:/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Typ biletu:/)).not.toBeInTheDocument()
+    expect(screen.queryByText('ksywa 4')).not.toBeInTheDocument()
+    expect(screen.queryByText('Gość')).not.toBeInTheDocument()
   })
 })
